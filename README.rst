@@ -20,7 +20,7 @@ PROVED (PRocess mining OVer uncErtain Data) is a collection of tools to perform 
 
 
 * Free software: GNU General Public License v3
-* Documentation: https://proved.readthedocs.io.
+* Documentation: TODO
 
 
 Features
