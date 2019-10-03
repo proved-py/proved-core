@@ -6,8 +6,7 @@ import proved.xes_keys as xes_keys
 
 
 # TODO: not needed when the quick construction of the behavior graph is ready
-def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
-            u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY,
+def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY,
             u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY):
     if u_timestamp_right in event1:
         if u_timestamp_left in event2:
@@ -21,8 +20,8 @@ def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
             return event1[timestamp_key] < event2[timestamp_key]
 
 
-def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY,
-                             u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
+                             u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     ts = transition_system.TransitionSystem()
     start = transition_system.TransitionSystem.State('start')
     start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
@@ -33,14 +32,11 @@ def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY,
     for i in range(0, len(trace)):
         if u_activity_key not in trace[i]:
             new_state = transition_system.TransitionSystem.State(trace[i][activity_key] + str(i))
-            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key],
-                                                                            trace[i][activity_key])])
+            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
         else:
-            new_state = transition_system.TransitionSystem.State(
-                '_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
-            new_state.data = (trace[i],
-                              [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity
-                               in trace[i][u_activity_key]['children']])
+            new_state = transition_system.TransitionSystem.State('_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
+            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
+                                         trace[i][u_activity_key]['children']])
         if u_missing in trace[i]:
             new_state.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
             new_state.name = new_state.name + '_ε'
@@ -58,10 +54,8 @@ def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY,
 
 # TODO: unfinished
 def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
-                                   u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY,
-                                   u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
-                                   u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
-                                   u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+                                   u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
+                                   u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     ts = transition_system.TransitionSystem()
     # start = transition_system.TransitionSystem.State('start')
     # start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
@@ -75,14 +69,11 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
     for i in range(0, len(trace)):
         if u_activity_key not in trace[i]:
             new_state = transition_system.TransitionSystem.State(trace[i][activity_key] + str(i))
-            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key],
-                                                                            trace[i][activity_key])])
+            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
         else:
-            new_state = transition_system.TransitionSystem.State(
-                '_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
-            new_state.data = (trace[i],
-                              [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity
-                               in trace[i][u_activity_key]['children']])
+            new_state = transition_system.TransitionSystem.State('_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
+            new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
+                                         trace[i][u_activity_key]['children']])
         if u_missing in trace[i]:
             new_state.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
             new_state.name = new_state.name + '_ε'
@@ -100,8 +91,7 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
 def construct_uncertain_trace_net(trace, trace_name_key=xes.DEFAULT_NAME_KEY):
     ts = construct_behavior_graph(trace)
 
-    net = petri.petrinet.PetriNet(
-        'trace net of %s' % trace.attributes[trace_name_key] if trace_name_key in trace.attributes else ' ')
+    net = petri.petrinet.PetriNet('trace net of %s' % trace.attributes[trace_name_key] if trace_name_key in trace.attributes else ' ')
     start_place = petri.petrinet.PetriNet.Place('start_place')
     net.places.add(start_place)
     end_place = petri.petrinet.PetriNet.Place('end_place')
