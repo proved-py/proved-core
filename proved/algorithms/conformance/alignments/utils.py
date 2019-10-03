@@ -57,14 +57,7 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
                                    u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
                                    u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     ts = transition_system.TransitionSystem()
-    # start = transition_system.TransitionSystem.State('start')
-    # start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
-    # ts.states.add(start)
-    # end = transition_system.TransitionSystem.State('end')
-    # end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
-    # ts.states.add(end)
 
-    ## TODO: add events 'Start' and 'End' in the trace, instead of directly in the graph
     t_list = []
     for i in range(0, len(trace)):
         if u_activity_key not in trace[i]:
@@ -82,10 +75,34 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
 
         # Fill in the timestamps list
         if u_timestamp_left not in trace[i]:
-            t_list.append((trace[i]['timestamp_key'], new_state, 'CERTAIN'))
+            t_list.append((trace[i][timestamp_key], new_state, 'CERTAIN'))
         else:
-            t_list.append((trace[i]['u_timestamp_left'], new_state, 'LEFT'))
-            t_list.append((trace[i]['u_timestamp_right'], new_state, 'RIGHT'))
+            t_list.append((trace[i][u_timestamp_left], new_state, 'LEFT'))
+            t_list.append((trace[i][u_timestamp_right], new_state, 'RIGHT'))
+
+    # Sort t_list by first term of its elements
+    t_list.sort()
+
+    # Adding events 'Start' and 'End' in the list
+    t_list.insert(0, (t_list[0][0] - 1, 'start', 'CERTAIN'))
+    t_list.append((t_list[-1][0] + 1, 'end', 'CERTAIN'))
+
+    for i, timestamp1 in enumerate(t_list):
+        if timestamp1[2] != 'LEFT':
+            for j, timestamp2 in enumerate(t_list, i + 1):
+                if timestamp1[2] == 'LEFT':
+                    utils.add_arc_from_to(repr(timestamp1[1]) + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
+                    continue
+                if timestamp1[2] == 'CERTAIN':
+                    utils.add_arc_from_to(repr(timestamp1[1]) + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
+                    break
+                if timestamp1[2] == 'RIGHT':
+                    if timestamp2[1] in timestamp1[1].outgoing:
+                        break
+                    else:
+                        continue
+
+    return ts
 
 
 def construct_uncertain_trace_net(trace, trace_name_key=xes.DEFAULT_NAME_KEY):
