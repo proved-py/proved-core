@@ -34,25 +34,7 @@ def alignment_upper_bound_su_trace_bruteforce(trace_net, tn_i, tn_f, petri_net, 
     realization_set = variants(trace_net, tn_i, tn_f)
     worst_alignment = None
 
-    # TODO: this conversion should be done in the pm4py.objects.petri.utils.variants function
-    for list_activities in realization_set:
-        # (log_name, noise_activity, "trace ", indexp1, "aligning ", i, "out of ", len(realization_set), " list_activities")
-
-        trace = Trace()
-        for act in list_activities:
-            if act is not "start" and act is not "end":
-                if act[0] is not "n":
-                    e = Event()
-                    e["concept:name"] = act
-                    trace.append(e)
-                else:
-                    try:
-                        int(act[1:])
-                    except:
-                        e = Event()
-                        e["concept:name"] = act
-                        trace.append(e)
-
+    for trace in realization_set:
         alignment = apply(trace, petri_net, initial_marking, final_marking, parameters)
         if alignment['cost'] > worst_alignment['cost']:
             worst_alignment = alignment
