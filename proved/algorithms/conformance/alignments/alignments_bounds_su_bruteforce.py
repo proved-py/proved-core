@@ -3,7 +3,7 @@
 #
 
 import pm4pycvxopt
-from pm4py.objects.petri.utils import variants
+from pm4py.objects.petri.utils import acyclic_net_variants
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply
 
 from proved.algorithms.conformance.alignments.utils import construct_uncertain_trace_net
@@ -15,7 +15,7 @@ def alignment_bounds_su_log_bruteforce(u_log, petri_net, initial_marking, final_
 
 def alignment_bounds_su_trace_bruteforce(u_trace, petri_net, initial_marking, final_marking, parameters=None):
     trace_net, tn_i, tn_f = construct_uncertain_trace_net(u_trace)
-    realization_set = variants(trace_net, tn_i, tn_f)
+    realization_set = acyclic_net_variants(trace_net, tn_i, tn_f)
     best_alignment = None
     worst_alignment = None
 
