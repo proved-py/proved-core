@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pm4py.objects import petri
 from pm4py.objects.log.util import xes
 from pm4py.objects.transition_system import transition_system, utils
@@ -31,28 +33,27 @@ def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing
     ts.states.add(end)
     for i in range(0, len(trace)):
         if u_activity_key not in trace[i]:
-            new_state = transition_system.TransitionSystem.State(trace[i][activity_key] + str(i))
+            new_state = transition_system.TransitionSystem.State(str(i) + ': ' + trace[i][activity_key])
             new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
         else:
-            new_state = transition_system.TransitionSystem.State('_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
+            new_state = transition_system.TransitionSystem.State(str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + '}')
             new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
                                          trace[i][u_activity_key]['children']])
         if u_missing in trace[i]:
             new_state.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
             new_state.name = new_state.name + '_ε'
 
-        utils.add_arc_from_to('start_' + repr(new_state), start, new_state, ts)
-        utils.add_arc_from_to(repr(new_state) + '_end', new_state, end, ts)
+        utils.add_arc_from_to('start > ' + repr(new_state), start, new_state, ts)
+        utils.add_arc_from_to(repr(new_state) + ' > end', new_state, end, ts)
         for state in ts.states:
             if state.name is not 'start' and state.name is not 'end' and ordered(state.data[0], trace[i]):
-                utils.add_arc_from_to(repr(state) + repr(new_state), state, new_state, ts)
+                utils.add_arc_from_to(repr(state) + ' > ' + repr(new_state), state, new_state, ts)
         ts.states.add(new_state)
 
     utils.transitive_reduction(ts)
     return ts
 
 
-# TODO: unfinished
 def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
                                    u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
                                    u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
@@ -61,15 +62,18 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
     t_list = []
     for i in range(0, len(trace)):
         if u_activity_key not in trace[i]:
-            new_state = transition_system.TransitionSystem.State(trace[i][activity_key] + str(i))
+            new_state = transition_system.TransitionSystem.State(str(i) + ': ' + trace[i][activity_key])
             new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
         else:
-            new_state = transition_system.TransitionSystem.State('_'.join(list(trace[i][u_activity_key]['children'].keys())) + str(i))
+            new_state = transition_system.TransitionSystem.State(str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + '}')
             new_state.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
                                          trace[i][u_activity_key]['children']])
         if u_missing in trace[i]:
             new_state.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
-            new_state.name = new_state.name + '_ε'
+            if u_activity_key not in trace[i]:
+                new_state.name = str(i) + ': {' + trace[i][activity_key] + ', ε}'
+            else:
+                new_state.name = str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + ', ε}'
 
         ts.states.add(new_state)
 
@@ -84,23 +88,27 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
     t_list.sort()
 
     # Adding events 'Start' and 'End' in the list
-    t_list.insert(0, (t_list[0][0] - 1, 'start', 'CERTAIN'))
-    t_list.append((t_list[-1][0] + 1, 'end', 'CERTAIN'))
+    start = transition_system.TransitionSystem.State('start')
+    start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
+    ts.states.add(start)
+    end = transition_system.TransitionSystem.State('end')
+    end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
+    ts.states.add(end)
+
+    t_list.insert(0, (datetime.min, start, 'CERTAIN'))
+    t_list.append((datetime.max, end, 'CERTAIN'))
 
     for i, timestamp1 in enumerate(t_list):
         if timestamp1[2] != 'LEFT':
-            for j, timestamp2 in enumerate(t_list, i + 1):
-                if timestamp1[2] == 'LEFT':
-                    utils.add_arc_from_to(repr(timestamp1[1]) + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
-                    continue
-                if timestamp1[2] == 'CERTAIN':
-                    utils.add_arc_from_to(repr(timestamp1[1]) + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
+            for timestamp2 in t_list[i + 1:]:
+                if timestamp2[2] == 'LEFT':
+                    utils.add_arc_from_to(repr(timestamp1[1]) + ' > ' + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
+                if timestamp2[2] == 'CERTAIN':
+                    utils.add_arc_from_to(repr(timestamp1[1]) + ' > ' + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
                     break
-                if timestamp1[2] == 'RIGHT':
+                if timestamp2[2] == 'RIGHT':
                     if timestamp2[1] in timestamp1[1].outgoing:
                         break
-                    else:
-                        continue
 
     return ts
 
@@ -132,3 +140,4 @@ def construct_uncertain_trace_net(trace, trace_name_key=xes.DEFAULT_NAME_KEY):
         if state.name == 'end':
             petri.utils.add_arc_from_to(state.data[1][0], end_place, net)
     return net, petri.petrinet.Marking({start_place: 1}), petri.petrinet.Marking({end_place: 1})
+
