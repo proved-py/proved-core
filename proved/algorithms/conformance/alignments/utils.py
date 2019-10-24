@@ -22,8 +22,8 @@ def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp
             return event1[timestamp_key] < event2[timestamp_key]
 
 
-def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
-                             u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def construct_behavior_graph_transitive_reduction(trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
+                                                  u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     ts = transition_system.TransitionSystem()
     start = transition_system.TransitionSystem.State('start')
     start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
@@ -54,9 +54,9 @@ def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing
     return ts
 
 
-def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
-                                   u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
-                                   u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def construct_behavior_graph(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
+                             u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
+                             u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     ts = transition_system.TransitionSystem()
 
     t_list = []
@@ -114,7 +114,7 @@ def construct_behavior_graph_quick(trace, activity_key=xes.DEFAULT_NAME_KEY, tim
 
 
 def construct_uncertain_trace_net(trace, trace_name_key=xes.DEFAULT_NAME_KEY):
-    ts = construct_behavior_graph(trace)
+    ts = construct_behavior_graph_transitive_reduction(trace)
 
     net = petri.petrinet.PetriNet('trace net of %s' % trace.attributes[trace_name_key] if trace_name_key in trace.attributes else ' ')
     start_place = petri.petrinet.PetriNet.Place('start_place')
