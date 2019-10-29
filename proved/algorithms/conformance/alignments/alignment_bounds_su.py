@@ -11,12 +11,6 @@ def alignment_bounds_su_log(u_log, petri_net, initial_marking, final_marking, pa
     return [alignment_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters) for u_trace in u_log]
 
 
-def alignment_bounds_su_trace_bruteforce(u_trace, petri_net, initial_marking, final_marking, parameters=None):
-    trace_net, tn_i, tn_f = construct_uncertain_trace_net(u_trace)
-    return (alignment_lower_bound_su_trace(trace_net, tn_i, tn_f, petri_net, initial_marking, final_marking, parameters),
-            alignment_upper_bound_su_trace_bruteforce(trace_net, tn_i, tn_f, petri_net, initial_marking, final_marking, parameters))
-
-
 def alignment_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters=None):
     trace_net, tn_i, tn_f = construct_uncertain_trace_net(u_trace)
     return (alignment_lower_bound_su_trace(trace_net, tn_i, tn_f, petri_net, initial_marking, final_marking, parameters),
