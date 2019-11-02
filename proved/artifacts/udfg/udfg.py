@@ -2,7 +2,31 @@ from pm4py.objects.log.util import xes
 
 import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
-from proved.artifacts.udfg.utils import is_bridge, find_all_paths, add_to_map, initialize_df_counts_map
+from proved.artifacts.udfg.utils import get_activity_labels, is_bridge, find_all_paths, add_to_map, initialize_df_counts_map, \
+    initialize_df_global_counts_map
+
+
+class Udfg(dict):
+
+    def __init__(self, log=None):
+        dict.__init__(self)
+        self.__activities = list()
+
+        if log is not None:
+            self.__set_activities(log)
+            self.__init__(initialize_df_global_counts_map(self.__activities))
+            # TODO: change act_intervals_counts_map from activity->(activity->(integer, integer)) to (activity, activity)->(integer, integer)
+            # TODO: and merge it with self
+            act_intervals_counts_map = get_activities_interval_counts(log, self.__activities)
+            get_directly_follow_intervals_log(self, log, self.__activities)
+
+    def __set_activities(self, log):
+        self.__activities = get_activity_labels(log)
+
+    def __get_activities(self):
+        return self.__activities
+
+    activities = property(__get_activities, __set_activities)
 
 
 def get_directly_follow_intervals_nodes(map, origin, target, bg):
@@ -29,8 +53,8 @@ def get_directly_follow_intervals_nodes(map, origin, target, bg):
             # Arco diretto tra i due nodi: se l'attività di entrambi non è uncertain e sono tutti e due ! e l'arco tra
             # i due nodi è un bridge aggiungo (1, 1), altrimenti aggiungo (0, 1)
             if len(origin.data[1]) == 1 and len(
-                    target.data[1]) == 1 and 'ε' not in origin.name and 'ε' not in target.name and is_bridge(bg, origin,
-                                                                                                             target):
+                target.data[1]) == 1 and 'ε' not in origin.name and 'ε' not in target.name and is_bridge(bg, origin,
+                                                                                                         target):
                 # add_to_map(map, origin, target, 1, 1)
                 add_to_map(map, origin, target, True)
             else:
@@ -172,7 +196,8 @@ def slice_udfg(act_map, rel_map, act_min, act_max, rel_min, rel_max):
             # print(target)
             if rel_map[source][target][1] != 0:
                 # print('pippo')
-                if rel_min <= rel_map[source][target][0] / rel_map[source][target][1] <= rel_max and source in filtered_activities and target in filtered_activities:
+                if rel_min <= rel_map[source][target][0] / rel_map[source][target][
+                    1] <= rel_max and source in filtered_activities and target in filtered_activities:
                     # print('pluto')
                     dfg.append(((source, target), 1))
     return dfg
