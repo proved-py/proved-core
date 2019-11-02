@@ -3,6 +3,8 @@ from pm4py.objects.transition_system import transition_system, utils
 from pm4py.objects import log as pm4py_log
 # from pm4py.algo.discovery.inductive.versions.dfg.dfg_only import apply_dfg, apply_tree_dfg, apply
 from pm4py.algo.discovery.inductive.versions.dfg.imdfb import apply_dfg, apply
+
+import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
 from proved.algorithms.discovery.udfg.utils import is_bridge, find_all_paths, add_to_map, get_activity_labels, \
     initialize_df_counts_map, initialize_df_global_counts_map
