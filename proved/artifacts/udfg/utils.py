@@ -4,6 +4,26 @@ from pm4py.objects.log.util import xes
 import proved.xes_keys as xes_keys
 
 
+def initialize_udfg(activities):
+    """
+    Given a list of activity labels, initializes the structure for a udfg
+    The resulting dictionary has the stucture
+    activity -> (integer, integer)
+    activity, activity) -> (integer, integer)
+
+    :param activities: the list of activity labels
+    :return: a dictionary initialized with the structure of a udfg
+    """
+
+    udfg = {}
+    for activity1 in activities:
+        udfg[activity1] = (0, 0)
+        for activity2 in activities:
+            udfg[(activity1, activity2)] = (0, 0)
+
+    return udfg
+
+
 def find_all_paths(origin, target):
     """
     Given a behavior graph, finds all the paths between two given nodes
@@ -28,6 +48,7 @@ def find_all_paths(origin, target):
                     new_path = list(path)
                     new_path.append(arc.to_state)
                     nodes_and_paths_to_process.append(new_path)
+
     return hits
 
 

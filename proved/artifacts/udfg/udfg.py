@@ -2,7 +2,7 @@ from pm4py.objects.log.util import xes
 
 import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
-from proved.artifacts.udfg.utils import get_activity_labels, is_bridge, find_all_paths, add_to_map, initialize_df_counts_map, \
+from proved.artifacts.udfg.utils import initialize_udfg, get_activity_labels, is_bridge, find_all_paths, add_to_map, initialize_df_counts_map, \
     initialize_df_global_counts_map
 
 
@@ -10,15 +10,16 @@ class Udfg(dict):
 
     def __init__(self, log=None):
         dict.__init__(self)
-        self.__activities = list()
+        self.__activities = []
 
         if log is not None:
             self.__set_activities(log)
-            self.__init__(initialize_df_global_counts_map(self.__activities))
-            # TODO: change act_intervals_counts_map from activity->(activity->(integer, integer)) to (activity, activity)->(integer, integer)
-            # TODO: and merge it with self
-            act_intervals_counts_map = get_activities_interval_counts(log, self.__activities)
-            get_directly_follow_intervals_log(self, log, self.__activities)
+            self.__init__(initialize_udfg(self.activities))
+            self.update(get_activities_interval_counts(log, self.activities))
+            # TODO: change get_activities_interval_counts_new from activity->(activity->(integer, integer))
+            # TODO: to (activity, activity)->(integer, integer) and merge it with self
+            self.update(get_activities_interval_counts(log, self.activities))
+            get_directly_follow_intervals_log(self, log, self.activities)
 
     def __set_activities(self, log):
         self.__activities = get_activity_labels(log)
@@ -200,6 +201,7 @@ def slice_udfg(act_map, rel_map, act_min, act_max, rel_min, rel_max):
                     1] <= rel_max and source in filtered_activities and target in filtered_activities:
                     # print('pluto')
                     dfg.append(((source, target), 1))
+
     return dfg
 
 
