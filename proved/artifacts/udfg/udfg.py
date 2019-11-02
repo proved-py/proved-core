@@ -1,5 +1,4 @@
 from pm4py.objects.log.util import xes
-# from pm4py.algo.discovery.inductive.versions.dfg.dfg_only import apply_dfg, apply_tree_dfg, apply
 
 import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
