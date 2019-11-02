@@ -14,19 +14,19 @@ class BehaviorGraph(DiGraph):
                  u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
         t_list = []
-        for i in range(len(trace)):
-            if u_activity_key not in trace[i]:
+        for i, event in enumerate(trace):
+            if u_activity_key not in event:
                 # new_node = transition_system.TransitionSystem.State(str(i) + ': ' + trace[i][activity_key])
                 # new_node.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
-                new_node = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
+                new_node = (event, [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + event[activity_key], event[activity_key])])
             else:
                 # new_node = transition_system.TransitionSystem.State(
                 #     str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + '}')
                 # new_node.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
                 #                              trace[i][u_activity_key]['children']])
-                new_node = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
-                                       trace[i][u_activity_key]['children']])
-            if u_missing in trace[i]:
+                new_node = (event, [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
+                                    event[u_activity_key]['children']])
+            if u_missing in event:
                 # new_node.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
                 new_node[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
                 # if u_activity_key not in trace[i]:
@@ -38,11 +38,11 @@ class BehaviorGraph(DiGraph):
             self.add_node(new_node)
 
             # Fill in the timestamps list
-            if u_timestamp_left not in trace[i]:
-                t_list.append((trace[i][timestamp_key], new_node, 'CERTAIN'))
+            if u_timestamp_left not in event:
+                t_list.append((event[timestamp_key], new_node, 'CERTAIN'))
             else:
-                t_list.append((trace[i][u_timestamp_left], new_node, 'LEFT'))
-                t_list.append((trace[i][u_timestamp_right], new_node, 'RIGHT'))
+                t_list.append((event[u_timestamp_left], new_node, 'LEFT'))
+                t_list.append((event[u_timestamp_right], new_node, 'RIGHT'))
 
         # Sort t_list by first term of its elements
         t_list.sort()
