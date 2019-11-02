@@ -46,16 +46,16 @@ def is_bridge(bg, state1, state2):
     if len(state1.outgoing) > 1 or len(state2.incoming) > 1:
         return False
 
-    # Temporarely remove the arc to check
+    # Temporarily remove the arc to check
     utils.remove_all_arcs_from_to(state1, state2, bg)
 
     # Perform a simple breadth-first search keeping track of all the states
     discovered = set()
-    to_process = set([state for state in bg.states if state.name == 'start'])
+    to_process = [state for state in bg.states if state.name == 'start']
     while to_process:
         current_state = to_process.pop()
         for arc in current_state.outgoing:
-            to_process.add(arc.to_state)
+            to_process.append(arc.to_state)
         discovered.add(current_state)
 
     # Re-adds the connection to avoid side-effects
@@ -123,12 +123,12 @@ def initialize_df_counts_map(activity_labels):
     return df_intervals_counts_map
 
 
-def add_to_map(map, origin, target, certain):
+def add_to_map(counts_map, origin, target, certain):
     """
     Given the map of counts and two nodes, adds to the map the min and max count from every activity of the first node
     to every activity of the second node
 
-    :param map: the map activity->(activity->(integer, integer)) to store the counts
+    :param counts_map: the map activity->(activity->(integer, integer)) to store the counts
     :param origin: the first node
     :param target: the second node
     :param min: the min count
@@ -137,4 +137,4 @@ def add_to_map(map, origin, target, certain):
     """
     for from_activity in [transition.label for transition in origin.data[1] if transition.label is not None]:
         for to_activity in [transition.label for transition in target.data[1] if transition.label is not None]:
-            map[(from_activity, to_activity)].append((origin, target, certain))
+            counts_map[(from_activity, to_activity)].append((origin, target, certain))
