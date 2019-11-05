@@ -1,2 +1,2 @@
-pm4py==1.2.4
+pm4py>=1.2.4
 pm4pycvxopt==0.0.5
