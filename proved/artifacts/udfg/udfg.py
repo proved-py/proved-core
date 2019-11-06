@@ -20,7 +20,7 @@ class Udfg(dict):
             # TODO: change get_activities_interval_counts_new from activity->(activity->(integer, integer))
             # TODO: to (activity, activity)->(integer, integer) and merge it with self
             # self.update(get_activities_interval_counts(log, self.activities))
-            get_df_counts(self, log)
+            get_df_counts_log(self, log)
             # get_directly_follow_intervals_log(self, log, self.activities)
 
     def __set_activities(self, log):
@@ -73,11 +73,13 @@ def get_activities_counts_trace(udfg, bg, n=1):
                 )
 
 
-def get_df_counts(log, udfg):
+def get_df_counts_log(udfg, log):
+    for bg, n in log:
+        get_df_counts_trace(bg, n, udfg)
+
+
+def get_df_counts_trace(udfg, bg, n=1):
     pass
-
-
-
 
 
 
