@@ -13,7 +13,10 @@ class BehaviorGraph(DiGraph):
                  u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY,
                  u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
-        t_list = []
+
+        timestamps_list = []
+        nodes_list = []
+        edges_list = []
         for i, event in enumerate(trace):
             if u_activity_key not in event:
                 # new_node = transition_system.TransitionSystem.State(str(i) + ': ' + trace[i][activity_key])
@@ -35,42 +38,49 @@ class BehaviorGraph(DiGraph):
                 #     new_node.name = str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + ', ε}'
 
             # ts.states.add(new_node)
-            self.add_node(new_node)
+            nodes_list.append(new_node)
 
             # Fill in the timestamps list
             if u_timestamp_left not in event:
-                t_list.append((event[timestamp_key], new_node, 'CERTAIN'))
+                timestamps_list.append((event[timestamp_key], new_node, 'CERTAIN'))
             else:
-                t_list.append((event[u_timestamp_left], new_node, 'LEFT'))
-                t_list.append((event[u_timestamp_right], new_node, 'RIGHT'))
+                timestamps_list.append((event[u_timestamp_left], new_node, 'LEFT'))
+                timestamps_list.append((event[u_timestamp_right], new_node, 'RIGHT'))
 
-        # Sort t_list by first term of its elements
-        t_list.sort()
+        # Sort timestamps_list by first term of its elements
+        timestamps_list.sort()
 
         # Adding events 'Start' and 'End' in the list
         # start = transition_system.TransitionSystem.State('start')
         # start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
         start = (None, [petri.petrinet.PetriNet.Transition('start', None)])
         # ts.states.add(start)
-        self.add_node(start)
+        nodes_list.append(start)
         # end = transition_system.TransitionSystem.State('end')
         # end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
         end = (None, [petri.petrinet.PetriNet.Transition('end', None)])
         # ts.states.add(end)
+        nodes_list.append(end)
 
-        t_list.insert(0, (datetime.min, start, 'CERTAIN'))
-        t_list.append((datetime.max, end, 'CERTAIN'))
+        # Adding the nodes to the graph object
+        self.add_nodes_from(nodes_list)
 
-        for i, timestamp1 in enumerate(t_list):
+        timestamps_list.insert(0, (datetime.min, start, 'CERTAIN'))
+        timestamps_list.append((datetime.max, end, 'CERTAIN'))
+
+        for i, timestamp1 in enumerate(timestamps_list):
             if timestamp1[2] != 'LEFT':
-                for timestamp2 in t_list[i + 1:]:
+                for timestamp2 in timestamps_list[i + 1:]:
                     if timestamp2[2] == 'LEFT':
                         # utils.add_arc_from_to(repr(timestamp1[1]) + ' > ' + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
-                        self.add_edge(timestamp1[1], timestamp2[1])
+                        edges_list.append((timestamp1[1], timestamp2[1]))
                     if timestamp2[2] == 'CERTAIN':
                         # utils.add_arc_from_to(repr(timestamp1[1]) + ' > ' + repr(timestamp2[1]), timestamp1[1], timestamp2[1], ts)
-                        self.add_edge(timestamp1[1], timestamp2[1])
+                        edges_list.append((timestamp1[1], timestamp2[1]))
                         break
                     if timestamp2[2] == 'RIGHT':
                         if timestamp2[1] in timestamp1[1].outgoing:
                             break
+
+        # Adding the edges to the graph object
+        self.add_edges_from(edges_list)
