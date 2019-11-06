@@ -8,6 +8,7 @@ import proved.xes_keys as xes_keys
 
 
 # TODO: clean code and remove the comments
+# TODO: absolutely needs a comparison function
 class BehaviorGraph(DiGraph):
 
     def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
