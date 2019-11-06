@@ -23,16 +23,22 @@ class BehaviorGraph(DiGraph):
             if u_activity_key not in event:
                 # new_node = transition_system.TransitionSystem.State(str(i) + ': ' + trace[i][activity_key])
                 # new_node.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + trace[i][activity_key], trace[i][activity_key])])
-                new_node = {event[activity_key]}
+                if u_missing not in event:
+                    new_node = frozenset([event[activity_key]])
+                else:
+                    new_node = frozenset([event[activity_key], None])
             else:
                 # new_node = transition_system.TransitionSystem.State(
                 #     str(i) + ': {' + ', '.join(list(trace[i][u_activity_key]['children'].keys())) + '}')
                 # new_node.data = (trace[i], [petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity, activity) for activity in
                 #                              trace[i][u_activity_key]['children']])
-                new_node = set(event[u_activity_key]['children'])
-            if u_missing in event:
+                if u_missing not in event:
+                    new_node = frozenset(event[u_activity_key]['children'])
+                else:
+                    new_node = frozenset(event[u_activity_key]['children'] + [None])
+            # if u_missing in event:
                 # new_node.data[1].append(petri.petrinet.PetriNet.Transition('t' + str(i) + '_silent', None))
-                new_node.add(None)
+                # new_node.add(None)
                 # if u_activity_key not in trace[i]:
                 #     new_node.name = str(i) + ': {' + trace[i][activity_key] + ', ε}'
                 # else:
@@ -54,12 +60,12 @@ class BehaviorGraph(DiGraph):
         # Adding events 'Start' and 'End' in the list
         # start = transition_system.TransitionSystem.State('start')
         # start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
-        start = {'START'}
+        start = frozenset(['START'])
         # ts.states.add(start)
         nodes_list.append(start)
         # end = transition_system.TransitionSystem.State('end')
         # end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
-        end = {'END'}
+        end = frozenset(['END'])
         # ts.states.add(end)
         nodes_list.append(end)
 
