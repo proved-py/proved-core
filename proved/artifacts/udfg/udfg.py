@@ -2,7 +2,7 @@ from pm4py.objects.log.util import xes
 
 import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
-from proved.artifacts.udfg.utils import initialize_udfg, get_activity_labels, is_bridge, find_all_paths, add_to_map, initialize_df_counts_map, \
+from proved.artifacts.udfg.utils import get_activity_labels, is_bridge, find_all_paths, add_to_map, initialize_df_counts_map, \
     initialize_df_global_counts_map
 
 
@@ -15,11 +15,13 @@ class Udfg(dict):
         if log is not None:
             self.__set_activities(log)
             self.__init__(initialize_udfg(self.activities))
-            self.update(get_activities_interval_counts(log, self.activities))
+            #self.update(get_activities_interval_counts(log, self.activities))
+            get_activities_counts_log(self, log)
             # TODO: change get_activities_interval_counts_new from activity->(activity->(integer, integer))
             # TODO: to (activity, activity)->(integer, integer) and merge it with self
-            self.update(get_activities_interval_counts(log, self.activities))
-            get_directly_follow_intervals_log(self, log, self.activities)
+            # self.update(get_activities_interval_counts(log, self.activities))
+            get_df_counts(self, log)
+            # get_directly_follow_intervals_log(self, log, self.activities)
 
     def __set_activities(self, log):
         self.__activities = get_activity_labels(log)
@@ -28,6 +30,111 @@ class Udfg(dict):
         return self.__activities
 
     activities = property(__get_activities, __set_activities)
+
+
+def initialize_udfg(activities):
+    """
+    Given a list of activity labels, initializes the structure for a udfg
+    The resulting dictionary has the stucture
+    activity -> (integer, integer)
+    activity, activity) -> (integer, integer)
+
+    :param activities: the list of activity labels
+    :return: a dictionary initialized with the structure of a udfg
+    """
+
+    udfg = {}
+    for activity1 in activities:
+        udfg[activity1] = (0, 0)
+        for activity2 in activities:
+            udfg[(activity1, activity2)] = (0, 0)
+
+    return udfg
+
+
+def get_activities_counts_log(udfg, log, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+    for bg, n in log:
+        get_activities_counts_trace(bg, n, udfg, activity_key, u_missing, u_activity_key)
+
+
+def get_activities_counts_trace(udfg, bg, n=1, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+    for node in bg.nodes:
+        event = node[0]
+        if u_activity_key not in node[0]:
+            if u_missing not in event:
+                udfg[event[activity_key]] = (
+                    udfg[event[activity_key]][0] + n,
+                    udfg[event[activity_key]][1] + n
+                )
+            else:
+                udfg[event[activity_key]] = (
+                    udfg[event[activity_key]][0],
+                    udfg[event[activity_key]][1] + n
+                )
+        else:
+            for activity_label in list(event[u_activity_key]['children']):
+                udfg[activity_label] = (
+                    udfg[activity_label][0],
+                    udfg[activity_label][1] + n
+                )
+
+
+def get_df_counts(log, udfg):
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def get_directly_follow_intervals_nodes(map, origin, target, bg):
