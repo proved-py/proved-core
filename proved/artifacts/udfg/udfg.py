@@ -52,27 +52,21 @@ def initialize_udfg(activities):
     return udfg
 
 
-def get_activities_counts_log(udfg, log, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def get_activities_counts_log(udfg, log):
     for bg, n in log:
-        get_activities_counts_trace(bg, n, udfg, activity_key, u_missing, u_activity_key)
+        get_activities_counts_trace(bg, n, udfg)
 
 
-def get_activities_counts_trace(udfg, bg, n=1, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def get_activities_counts_trace(udfg, bg, n=1):
     for node in bg.nodes:
-        event = node[0]
-        if u_activity_key not in node[0]:
-            if u_missing not in event:
-                udfg[event[activity_key]] = (
-                    udfg[event[activity_key]][0] + n,
-                    udfg[event[activity_key]][1] + n
-                )
-            else:
-                udfg[event[activity_key]] = (
-                    udfg[event[activity_key]][0],
-                    udfg[event[activity_key]][1] + n
-                )
+        if len(node) == 1:
+            activity_label = next(iter(node))
+            udfg[activity_label] = (
+                udfg[activity_label][0] + n,
+                udfg[activity_label][1] + n
+            )
         else:
-            for activity_label in list(event[u_activity_key]['children']):
+            for activity_label in node - {'START', 'END', None}:
                 udfg[activity_label] = (
                     udfg[activity_label][0],
                     udfg[activity_label][1] + n
