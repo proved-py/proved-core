@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from networkx import DiGraph
-from pm4py.objects import petri
 from pm4py.objects.log.util import xes
 
 import proved.xes_keys as xes_keys
@@ -60,12 +59,12 @@ class BehaviorGraph(DiGraph):
         # Adding events 'Start' and 'End' in the list
         # start = transition_system.TransitionSystem.State('start')
         # start.data = (None, [petri.petrinet.PetriNet.Transition('start', None)])
-        start = frozenset(['START'])
+        start = frozenset([None])
         # ts.states.add(start)
         nodes_list.append(start)
         # end = transition_system.TransitionSystem.State('end')
         # end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
-        end = frozenset(['END'])
+        end = frozenset([None])
         # ts.states.add(end)
         nodes_list.append(end)
 
