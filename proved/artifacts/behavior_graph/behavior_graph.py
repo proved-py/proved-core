@@ -62,6 +62,7 @@ class BehaviorGraph(DiGraph):
         start = frozenset([None])
         # ts.states.add(start)
         nodes_list.append(start)
+        self.__root = start
         # end = transition_system.TransitionSystem.State('end')
         # end.data = (None, [petri.petrinet.PetriNet.Transition('end', None)])
         end = frozenset([None])
@@ -90,3 +91,8 @@ class BehaviorGraph(DiGraph):
 
         # Adding the edges to the graph object
         self.add_edges_from(edges_list)
+
+    def __get_root(self):
+        return self.__root
+
+    root = property(__get_root)
