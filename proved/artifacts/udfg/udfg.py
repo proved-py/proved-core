@@ -96,29 +96,40 @@ def get_df_counts_trace(udfg, bg, n=1):
             used_left = set()
             used_right = set()
             for node_from, successors in bfs_successors(bg, bg.root):
+                # Check if a directly-follows occurs in all realizations of the uncertain trace
                 for node_to in successors:
-                    if activity_from in node_from and activity_to in node_to:
-                        # Case activity_from != activity_to: each node can be used only once
-                        # Case activity_from == activity_to: each node can be used once on the left side, once on the right side
+                    if node_from == {activity_from} and node_to == {activity_to} and (node_from, node_to) in bg_bridges:
                         if (
                             activity_from != activity_to and {node_from, node_to}.isdisjoint(used_left | used_right)
                         ) or (
                             activity_from == activity_to and node_from not in used_left and node_to not in used_right
                         ):
-                            # Found a valid match
-                            # Check if this directly-follows occurs in all realizations of the uncertain trace
-                            if len(node_from) == len(node_to) == 1 and (node_from, node_to) in bg_bridges:
-                                udfg[(activity_from, activity_to)] = (
-                                    udfg[(activity_from, activity_to)][0] + n,
-                                    udfg[(activity_from, activity_to)][1] + n
-                                )
-                            else:
+                            udfg[(activity_from, activity_to)] = (
+                                udfg[(activity_from, activity_to)][0] + n,
+                                udfg[(activity_from, activity_to)][1] + n
+                            )
+                            used_left.add(node_from)
+                            used_right.add(node_to)
+                            break
+                # If not, we look for a directly-follows relationship that only occurs on some realizations
+                node_to_candidates = successors  # TODO: maybe needs a shallow copy
+                while node_to_candidates:
+                    for node_to in node_to_candidates:
+                        if activity_from in node_from and activity_to in node_to:
+                            if (
+                                activity_from != activity_to and {node_from, node_to}.isdisjoint(used_left | used_right)
+                            ) or (
+                                activity_from == activity_to and node_from not in used_left and node_to not in used_right
+                            ):
                                 udfg[(activity_from, activity_to)] = (
                                     udfg[(activity_from, activity_to)][0],
                                     udfg[(activity_from, activity_to)][1] + n
                                 )
-                            used_left.add(node_from)
-                            used_right.add(node_to)
+                                used_left.add(node_from)
+                                used_right.add(node_to)
+                                break
+                    node_to_candidates = set.union(*[node.successor for node in node_to_candidates if None in node])
+
 
 
 
