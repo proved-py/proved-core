@@ -1,4 +1,6 @@
 from pm4py.objects.log.util import xes
+from networkx.algorithms.traversal.breadth_first_search import bfs_successors
+from networkx.algorithms.bridges import bridges
 
 import proved.xes_keys as xes_keys
 from proved.algorithms.conformance.alignments.utils import construct_behavior_graph
@@ -9,13 +11,14 @@ from proved.artifacts.udfg.utils import get_activity_labels, is_bridge, find_all
 class Udfg(dict):
 
     def __init__(self, log=None):
+
         dict.__init__(self)
         self.__activities = []
 
         if log is not None:
             self.__set_activities(log)
             self.__init__(initialize_udfg(self.activities))
-            #self.update(get_activities_interval_counts(log, self.activities))
+            # self.update(get_activities_interval_counts(log, self.activities))
             get_activities_counts_log(self, log)
             # TODO: change get_activities_interval_counts_new from activity->(activity->(integer, integer))
             # TODO: to (activity, activity)->(integer, integer) and merge it with self
@@ -78,8 +81,44 @@ def get_df_counts_log(udfg, log):
         get_df_counts_trace(bg, n, udfg)
 
 
+# TODO: modify the implementation so that instead of selecting a pair of activities first and then search, it starts with the
+# search and then for each pair of node it iterates on their activity labels
+# TODO: this does not take into account indeterminate events! Complete the subsearch for long-distance bindings!
 def get_df_counts_trace(udfg, bg, n=1):
-    pass
+    # Fetches all the activities in the uncertain trace
+    bg_activities = set.union(*bg.nodes) - {None}  # TODO: specifically check this
+    # Fetches all the bridges in the behavior graph
+    bg_bridges = bridges(bg)
+    # Checks the number of directly-follows relationships for each pair of activities in the uncertain trace
+    for activity_from in bg_activities:
+        for activity_to in bg_activities:
+            # Lists to keep track of nodes already bound in a directly follows relationship
+            used_left = set()
+            used_right = set()
+            for node_from, successors in bfs_successors(bg, bg.root):
+                for node_to in successors:
+                    if activity_from in node_from and activity_to in node_to:
+                        # Case activity_from != activity_to: each node can be used only once
+                        # Case activity_from == activity_to: each node can be used once on the left side, once on the right side
+                        if (
+                            activity_from != activity_to and {node_from, node_to}.isdisjoint(used_left | used_right)
+                        ) or (
+                            activity_from == activity_to and node_from not in used_left and node_to not in used_right
+                        ):
+                            # Found a valid match
+                            # Check if this directly-follows occurs in all realizations of the uncertain trace
+                            if len(node_from) == len(node_to) == 1 and (node_from, node_to) in bg_bridges:
+                                udfg[(activity_from, activity_to)] = (
+                                    udfg[(activity_from, activity_to)][0] + n,
+                                    udfg[(activity_from, activity_to)][1] + n
+                                )
+                            else:
+                                udfg[(activity_from, activity_to)] = (
+                                    udfg[(activity_from, activity_to)][0],
+                                    udfg[(activity_from, activity_to)][1] + n
+                                )
+                            used_left.add(node_from)
+                            used_right.add(node_to)
 
 
 
