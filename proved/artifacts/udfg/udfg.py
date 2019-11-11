@@ -83,7 +83,7 @@ def get_df_counts_log(udfg, log):
 
 # TODO: modify the implementation so that instead of selecting a pair of activities first and then search, it starts with the
 # search and then for each pair of node it iterates on their activity labels
-# TODO: this does not take into account indeterminate events! Complete the subsearch for long-distance bindings!
+# TODO: this does not consider unconnected nodes that can be in a directly-follows relationship (parallel ones)
 def get_df_counts_trace(udfg, bg, n=1):
     # Fetches all the activities in the uncertain trace
     bg_activities = set.union(*bg.nodes) - {None}  # TODO: specifically check this
