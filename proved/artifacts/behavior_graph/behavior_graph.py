@@ -86,7 +86,7 @@ class BehaviorGraph(DiGraph):
                         edges_list.append((timestamp1[1], timestamp2[1]))
                         break
                     if timestamp2[2] == 'RIGHT':
-                        if timestamp2[1] in timestamp1[1].outgoing:
+                        if (timestamp1[1], timestamp2[1]) in edges_list:
                             break
 
         # Adding the edges to the graph object
