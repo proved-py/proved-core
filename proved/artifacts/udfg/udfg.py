@@ -81,8 +81,6 @@ def get_df_counts_log(udfg, log):
         get_df_counts_trace(bg, n, udfg)
 
 
-# TODO: modify the implementation so that instead of selecting a pair of activities first and then search, it starts with the
-# search and then for each pair of node it iterates on their activity labels
 # TODO: this does not consider unconnected nodes that can be in a directly-follows relationship (parallel ones)
 # TODO: every time an indeterminate event is chosen in a pair, it cannot be skipped anymore by other nodes (line 132, add conditions: node should not be in used)
 def get_df_counts_trace(udfg, bg, n=1):
