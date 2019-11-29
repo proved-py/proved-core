@@ -81,8 +81,9 @@ def get_df_counts_log(udfg, log):
         get_df_counts_trace(bg, n, udfg)
 
 
-# TODO: this does not consider unconnected nodes that can be in a directly-follows relationship (parallel ones)
-# TODO: every time an indeterminate event is chosen in a pair, it cannot be skipped anymore by other nodes (line 132, add conditions: node should not be in used)
+# TODO: this does not consider unconnected nodes that can be in a directly-follows relationship ("parallel" ones)
+# In order to account for "parallel" nodes, the search through the graph must proceed in layers
+# Also, between parallel nodes the binding order counts!
 def get_df_counts_trace(udfg, bg, n=1):
     # Fetches all the activities in the uncertain trace
     bg_activities = set.union(*bg.nodes) - {None}  # TODO: specifically check this
@@ -127,7 +128,9 @@ def get_df_counts_trace(udfg, bg, n=1):
                                 used_left.add(node_from)
                                 used_right.add(node_to)
                                 break
-                    node_to_candidates = set.union(*[node.successor for node in node_to_candidates if None in node])
+                    # The candidate list should include every successor that is indeterminate and not yet chosen
+                    # for a directly follow realtionship
+                    node_to_candidates = set.union(*[node.successor for node in node_to_candidates if None in node and node not in used_left and node not in used_right])
 
 
 
