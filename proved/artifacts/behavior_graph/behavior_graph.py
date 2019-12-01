@@ -22,14 +22,14 @@ class BehaviorGraph(DiGraph):
         for i, event in enumerate(trace):
             if u_activity_key not in event:
                 if u_missing not in event:
-                    new_node = frozenset([event[activity_key]])
+                    new_node = frozenset((i, tuple([event[activity_key]])))
                 else:
-                    new_node = frozenset([event[activity_key], None])
+                    new_node = frozenset((i, tuple([event[activity_key], None])))
             else:
                 if u_missing not in event:
-                    new_node = frozenset(event[u_activity_key]['children'])
+                    new_node = frozenset((i, tuple(event[u_activity_key]['children'])))
                 else:
-                    new_node = frozenset(event[u_activity_key]['children'] + [None])
+                    new_node = frozenset((i, tuple(event[u_activity_key]['children'] + [None])))
 
             nodes_list.append(new_node)
 
@@ -44,10 +44,10 @@ class BehaviorGraph(DiGraph):
         timestamps_list.sort()
 
         # Adding events 'Start' and 'End' in the list
-        start = frozenset([None])
+        start = frozenset(['start'])
         nodes_list.append(start)
         self.__root = start
-        end = frozenset([None])
+        end = frozenset(['end'])
         nodes_list.append(end)
 
         # Adding the nodes to the graph object
@@ -91,6 +91,8 @@ def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
         else:
             return event1[timestamp_key] < event2[timestamp_key]
 
+import matplotlib.pyplot as plt
+from networkx.drawing.nx_pylab import draw
 
 class TRBehaviorGraph(DiGraph):
 
@@ -100,10 +102,10 @@ class TRBehaviorGraph(DiGraph):
 
         bg = DiGraph()
 
-        start = frozenset([None])
+        start = frozenset(['start'])
         bg.add_node(start)
         bg.__root = start
-        end = frozenset([None])
+        end = frozenset(['end'])
         bg.add_node(end)
 
         nodes_list = []
@@ -113,14 +115,14 @@ class TRBehaviorGraph(DiGraph):
         for i, event in enumerate(trace):
             if u_activity_key not in event:
                 if u_missing not in event:
-                    new_node = frozenset([event[activity_key]])
+                    new_node = frozenset((i, tuple([event[activity_key]])))
                 else:
-                    new_node = frozenset([event[activity_key], None])
+                    new_node = frozenset((i, tuple([event[activity_key], None])))
             else:
                 if u_missing not in event:
-                    new_node = frozenset(event[u_activity_key]['children'])
+                    new_node = frozenset((i, tuple(event[u_activity_key]['children'])))
                 else:
-                    new_node = frozenset(event[u_activity_key]['children'] + [None])
+                    new_node = frozenset((i, tuple(event[u_activity_key]['children'] + [None])))
 
             nodes_list.append(new_node)
 
@@ -131,12 +133,20 @@ class TRBehaviorGraph(DiGraph):
         for i, event1 in enumerate(trace):
             for j, event2 in enumerate(trace):
                 if ordered(event1, event2):
-                    edges_list.append((event1, event2))
+                    edges_list.append((event_node_map[i], event_node_map[j]))
 
         bg.add_nodes_from(nodes_list)
         bg.add_edges_from(edges_list)
 
-        bg = transitive_reduction(bg)
+        from networkx.algorithms.dag import is_directed_acyclic_graph
+        if is_directed_acyclic_graph(bg):
+            # draw(bg)
+            # plt.savefig('test')
+            # plt.close()
+
+            bg = transitive_reduction(bg)
+        else:
+            print([event['concept:name'] for event in trace])
 
         self.add_nodes_from(bg.nodes)
         self.__root = start
