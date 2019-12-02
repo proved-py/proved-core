@@ -91,11 +91,8 @@ def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
         else:
             return event1[timestamp_key] < event2[timestamp_key]
 
-import matplotlib.pyplot as plt
-from networkx.drawing.nx_pylab import draw
 
 class TRBehaviorGraph(DiGraph):
-
     def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
                  u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
@@ -138,15 +135,7 @@ class TRBehaviorGraph(DiGraph):
         bg.add_nodes_from(nodes_list)
         bg.add_edges_from(edges_list)
 
-        from networkx.algorithms.dag import is_directed_acyclic_graph
-        if is_directed_acyclic_graph(bg):
-            # draw(bg)
-            # plt.savefig('test')
-            # plt.close()
-
-            bg = transitive_reduction(bg)
-        else:
-            print([event['concept:name'] for event in trace])
+        bg = transitive_reduction(bg)
 
         self.add_nodes_from(bg.nodes)
         self.__root = start
