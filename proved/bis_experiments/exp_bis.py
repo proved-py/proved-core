@@ -63,11 +63,11 @@ fixed_ntraces = 1000
 fixed_length = 25
 
 
-def length_experiment(lengths):
+def probability_experiment(probs):
     naive_times = []
     improved_times = []
-    for length in lengths:
-        parameters = {'mode': length, 'min': length - 1, 'max': length + 1, 'loop': .5, 'silent': 0}
+    for p_u_time in probs:
+        parameters = {'mode': fixed_length, 'min': fixed_length - 1, 'max': fixed_length + 1, 'loop': .5, 'silent': 0}
 
         tree = tree_gen_factory.apply(parameters=parameters)
         log = semantics.generate_log(tree, no_traces=fixed_ntraces)
@@ -75,17 +75,19 @@ def length_experiment(lengths):
         act_labels = get_attribute_values(log, 'concept:name')
 
         unc_log = log
-        introduce_uncertainty(unc_log, act_labels, parameters={'p_u_time': fixed_prob})
+        introduce_uncertainty(unc_log, act_labels, parameters={'p_u_time': p_u_time})
         a = time.process_time()
         for trace in unc_log:
             bg = behavior_graph.TRBehaviorGraph(trace)
+        # print(naive_times)
         naive_times.append(time.process_time() - a)
+        # print(naive_times)
         a = time.process_time()
         for trace in unc_log:
             bg = behavior_graph.BehaviorGraph(trace)
         improved_times.append(time.process_time() - a)
 
-        return naive_times, improved_times
+    return naive_times, improved_times
 
 
 def ntraces_experiment(nstraces):
@@ -110,14 +112,14 @@ def ntraces_experiment(nstraces):
             bg = behavior_graph.BehaviorGraph(trace)
         improved_times.append(time.process_time() - a)
 
-        return naive_times, improved_times
+    return naive_times, improved_times
 
 
-def probability_experiment(probs):
+def length_experiment(lengths):
     naive_times = []
     improved_times = []
-    for p_u_time in probs:
-        parameters = {'mode': fixed_length, 'min': fixed_length-1, 'max': fixed_length+1, 'loop': .5, 'silent': 0}
+    for length in lengths:
+        parameters = {'mode': length, 'min': length - 1, 'max': length + 1, 'loop': .5, 'silent': 0}
 
         tree = tree_gen_factory.apply(parameters=parameters)
         log = semantics.generate_log(tree, no_traces=fixed_ntraces)
@@ -125,7 +127,7 @@ def probability_experiment(probs):
         act_labels = get_attribute_values(log, 'concept:name')
 
         unc_log = log
-        introduce_uncertainty(unc_log, act_labels, parameters={'p_u_time': p_u_time})
+        introduce_uncertainty(unc_log, act_labels, parameters={'p_u_time': fixed_prob})
         a = time.process_time()
         for trace in unc_log:
             bg = behavior_graph.TRBehaviorGraph(trace)
@@ -139,9 +141,9 @@ def probability_experiment(probs):
 
 
 if __name__ == '__main__':
-    probs = [0, .1, .2, .3, .4, .5]
-    nstraces = [10, 100, 1000, 10000, 100000]
-    lengths = [10, 20, 30, 40, 50]
+    probs = [0, .1, .2, .3, .4, .5, .6]
+    nstraces = [10, 100, 1000, 10000, 100000, 1000000, 10000000]
+    lengths = [10, 20, 30, 40, 50, 60, 70]
 
     random.seed(123456)
 
@@ -174,11 +176,11 @@ if __name__ == '__main__':
     length_results = [length_experiment(lengths) for i in range(ntests)]
     with open('lengths_results_naive.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
+        csvwriter.writerow(lengths)
         for line in length_results:
             csvwriter.writerow(line[0])
     with open('lengths_results_improved.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
+        csvwriter.writerow(lengths)
         for line in length_results:
             csvwriter.writerow(line[1])
