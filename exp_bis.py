@@ -115,11 +115,37 @@ def ntraces_experiment(nstraces):
     return naive_times, improved_times
 
 
-def length_experiment(lengths):
+# def length_experiment(lengths):
+#     naive_times = []
+#     improved_times = []
+#     for length in lengths:
+#         parameters = {'mode': length, 'min': length - 1, 'max': length + 1, 'loop': .5, 'silent': 0}
+#
+#         tree = tree_gen_factory.apply(parameters=parameters)
+#         log = semantics.generate_log(tree, no_traces=fixed_ntraces)
+#
+#         act_labels = get_attribute_values(log, 'concept:name')
+#
+#         unc_log = log
+#         introduce_uncertainty(unc_log, act_labels, parameters={'p_u_time': fixed_prob})
+#         a = time.process_time()
+#         for trace in unc_log:
+#             bg = behavior_graph.TRBehaviorGraph(trace)
+#         naive_times.append(time.process_time() - a)
+#         a = time.process_time()
+#         for trace in unc_log:
+#             bg = behavior_graph.BehaviorGraph(trace)
+#         improved_times.append(time.process_time() - a)
+#
+#     return naive_times, improved_times
+
+
+def recursion_experiment(recursions):
     naive_times = []
     improved_times = []
-    for length in lengths:
-        parameters = {'mode': length, 'min': length - 1, 'max': length + 1, 'loop': .5, 'silent': 0}
+    len_traces = []
+    for recursion in recursions:
+        parameters = {'loop': .5, 'silent': 0, 'sequence': recursion, 'choice': recursion, 'parallel': recursion}
 
         tree = tree_gen_factory.apply(parameters=parameters)
         log = semantics.generate_log(tree, no_traces=fixed_ntraces)
@@ -136,51 +162,69 @@ def length_experiment(lengths):
         for trace in unc_log:
             bg = behavior_graph.BehaviorGraph(trace)
         improved_times.append(time.process_time() - a)
+        len_traces.append(np.mean([len(trace) for trace in log]))
 
-    return naive_times, improved_times
+    return naive_times, improved_times, len_traces
 
 
 if __name__ == '__main__':
     probs = [0, .1, .2, .3, .4, .5, .6]
     nstraces = [10, 100, 1000, 10000, 100000, 1000000, 10000000]
     lengths = [10, 20, 30, 40, 50, 60, 70]
+    recursions = [.25, .35, .45, .55]
 
     random.seed(123456)
 
     ntests = 10
 
-    probs_results = [probability_experiment(probs) for i in range(ntests)]
-    with open('probs_results_naive.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(probs)
-        for line in probs_results:
-            csvwriter.writerow(line[0])
-    with open('probs_results_improved.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(probs)
-        for line in probs_results:
-            csvwriter.writerow(line[1])
+    # probs_results = [probability_experiment(probs) for i in range(ntests)]
+    # with open('probs_results_naive.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(probs)
+    #     for line in probs_results:
+    #         csvwriter.writerow(line[0])
+    # with open('probs_results_improved.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(probs)
+    #     for line in probs_results:
+    #         csvwriter.writerow(line[1])
+    #
+    # ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
+    # with open('ntraces_results_naive.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(nstraces)
+    #     for line in ntraces_results:
+    #         csvwriter.writerow(line[0])
+    # with open('ntraces_results_improved.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(nstraces)
+    #     for line in ntraces_results:
+    #         csvwriter.writerow(line[1])
 
-    ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
-    with open('ntraces_results_naive.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
-        for line in ntraces_results:
-            csvwriter.writerow(line[0])
-    with open('ntraces_results_improved.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
-        for line in ntraces_results:
-            csvwriter.writerow(line[1])
+    # length_results = [length_experiment(lengths) for i in range(ntests)]
+    # with open('lengths_results_naive.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(lengths)
+    #     for line in length_results:
+    #         csvwriter.writerow(line[0])
+    # with open('lengths_results_improved.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(lengths)
+    #     for line in length_results:
+    #         csvwriter.writerow(line[1])
 
-    length_results = [length_experiment(lengths) for i in range(ntests)]
-    with open('lengths_results_naive.csv', 'w') as csvfile:
+    recursion_results = [recursion_experiment(recursions) for i in range(ntests)]
+    with open('recursion_results_naive.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(lengths)
-        for line in length_results:
+        csvwriter.writerow(recursions)
+        for line in recursion_results:
             csvwriter.writerow(line[0])
-    with open('lengths_results_improved.csv', 'w') as csvfile:
+        for line in recursion_results:
+            csvwriter.writerow(line[2])
+    with open('recursion_results_improved.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(lengths)
-        for line in length_results:
+        csvwriter.writerow(recursions)
+        for line in recursion_results:
             csvwriter.writerow(line[1])
+        for line in recursion_results:
+            csvwriter.writerow(line[2])
