@@ -31,7 +31,7 @@ def create_log(numtraces, lentraces, p_u_time):
 
 fixed_prob = .4
 fixed_ntraces = 1000
-fixed_length = 25
+fixed_length = 30
 
 
 def probability_experiment(probs):
