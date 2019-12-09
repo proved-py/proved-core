@@ -31,7 +31,7 @@ def create_log(numtraces, lentraces, p_u_time):
 
 fixed_prob = .4
 fixed_ntraces = 1000
-fixed_length = 30
+fixed_length = 50
 
 
 def probability_experiment(probs):
@@ -87,8 +87,8 @@ def length_experiment(lengths):
 
 if __name__ == '__main__':
     probs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
-    nstraces = [500, 1000, 1500, 2000, 2500, 3000]
-    lengths = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+    nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
+    lengths = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
 
     random.seed(123456)
 
