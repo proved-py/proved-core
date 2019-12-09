@@ -88,35 +88,36 @@ def length_experiment(lengths):
 if __name__ == '__main__':
     probs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
     nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
-    lengths = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+    # lengths = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+    lenghts = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300]
 
     random.seed(123456)
 
     ntests = 10
 
-    probs_results = [probability_experiment(probs) for i in range(ntests)]
-    with open('probs_results_naive.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(probs)
-        for line in probs_results:
-            csvwriter.writerow(line[0])
-    with open('probs_results_improved.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(probs)
-        for line in probs_results:
-            csvwriter.writerow(line[1])
-
-    ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
-    with open('ntraces_results_naive.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
-        for line in ntraces_results:
-            csvwriter.writerow(line[0])
-    with open('ntraces_results_improved.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(nstraces)
-        for line in ntraces_results:
-            csvwriter.writerow(line[1])
+    # probs_results = [probability_experiment(probs) for i in range(ntests)]
+    # with open('probs_results_naive.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(probs)
+    #     for line in probs_results:
+    #         csvwriter.writerow(line[0])
+    # with open('probs_results_improved.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(probs)
+    #     for line in probs_results:
+    #         csvwriter.writerow(line[1])
+    #
+    # ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
+    # with open('ntraces_results_naive.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(nstraces)
+    #     for line in ntraces_results:
+    #         csvwriter.writerow(line[0])
+    # with open('ntraces_results_improved.csv', 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+    #     csvwriter.writerow(nstraces)
+    #     for line in ntraces_results:
+    #         csvwriter.writerow(line[1])
 
     length_results = [length_experiment(lengths) for i in range(ntests)]
     with open('lengths_results_naive.csv', 'w') as csvfile:
