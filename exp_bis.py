@@ -162,18 +162,18 @@ if __name__ == '__main__':
     ############################################################################
     ############################################################################
     ############################################################################
-    # length_results = [length_experiment(lengths) for i in range(ntests)]
-    # with open('lengths_results_naive.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(lengths)
-    #     for line in length_results:
-    #         csvwriter.writerow(line[0])
-    # with open('lengths_results_improved.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(lengths)
-    #     for line in length_results:
-    #         csvwriter.writerow(line[1])
-    #
+    length_results = [length_experiment(lengths) for i in range(ntests)]
+    with open('lengths_results_naive.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+        csvwriter.writerow(lengths)
+        for line in length_results:
+            csvwriter.writerow(line[0])
+    with open('lengths_results_improved.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+        csvwriter.writerow(lengths)
+        for line in length_results:
+            csvwriter.writerow(line[1])
+
     for logfile in reallife_logs:
         reallife_results = [reallife_experiments(logfile, reallife_probs) for i in range(ntests)]
         with open(logfile + '_results_naive.csv', 'w') as csvfile:
