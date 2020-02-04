@@ -11,6 +11,16 @@ from proved.artifacts.behavior_graph import behavior_graph, tr_behavior_graph
 
 
 def create_log(numtraces, lentraces, p_u_time):
+    """
+    Creates an event log with fixed-length traces, and all events have activity label 'a'.
+    Timestamps are uncertain with some probability.
+
+    :param numtraces: number of traces to be generated
+    :param lentraces: length of the traces in the log
+    :param p_u_time: probability of uncertain timestamp
+    :return: an event log with uncertain timestamps
+    """
+
     basetime = datetime.fromtimestamp(10000000)
     log = []
     for i in range(numtraces):
@@ -31,6 +41,14 @@ def create_log(numtraces, lentraces, p_u_time):
 
 
 def introduce_uncertainty(log, p_u_time):
+    """
+    Adds uncertainty on timestamps in a preexisting event log with some probability.
+
+    :param log: the input event log
+    :param p_u_time: probability of uncertain timestamp
+    :return: the input event log with uncertain timestamps
+    """
+
     timevariation = timedelta(seconds=1)
     for trace in log:
         if len(trace) > 1:
@@ -53,6 +71,7 @@ fixed_length = 50
 
 
 def probability_experiment(probs):
+
     naive_times = []
     improved_times = []
     for p_u_time in probs:
@@ -70,6 +89,7 @@ def probability_experiment(probs):
 
 
 def ntraces_experiment(nstraces):
+
     naive_times = []
     improved_times = []
     for n in nstraces:
@@ -87,6 +107,7 @@ def ntraces_experiment(nstraces):
 
 
 def length_experiment(lengths):
+
     naive_times = []
     improved_times = []
     for length in lengths:
@@ -104,6 +125,7 @@ def length_experiment(lengths):
 
 
 def reallife_experiments(logfile, probs):
+
     naive_times = []
     improved_times = []
     for p_u_time in probs:
@@ -122,6 +144,7 @@ def reallife_experiments(logfile, probs):
 
 
 def print_to_csv(results, filename):
+
     with open(filename + '_results_naive.csv', 'w') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
         csvwriter.writerow(lengths)
@@ -135,6 +158,7 @@ def print_to_csv(results, filename):
 
 
 if __name__ == '__main__':
+
     probs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
     nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500,
                 9000, 9500, 10000]
