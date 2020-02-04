@@ -121,13 +121,24 @@ def reallife_experiments(logfile, probs):
     return naive_times, improved_times
 
 
+def print_to_csv(results, filename):
+    with open(filename + '_results_naive.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+        csvwriter.writerow(lengths)
+        for line in results:
+            csvwriter.writerow(line[0])
+    with open(filename + '_results_improved.csv', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
+        csvwriter.writerow(lengths)
+        for line in results:
+            csvwriter.writerow(line[1])
+
+
 if __name__ == '__main__':
     probs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
     nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500,
                 9000, 9500, 10000]
-    # lengths = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-    # lengths = [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300]
-    lengths = [100, 150, 200, 250, 300, 350, 400, 450, 500]
+    lengths = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]
     reallife_probs = [0, .4, .8]
     reallife_logs = ['BPI_Challenge_2012.xes', 'Help_Desk_event_log.xes', 'Road_Traffic_Fine_Management_Process.xes']
 
@@ -135,55 +146,15 @@ if __name__ == '__main__':
 
     ntests = 10
 
-    # probs_results = [probability_experiment(probs) for i in range(ntests)]
-    # with open('probs_results_naive.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(probs)
-    #     for line in probs_results:
-    #         csvwriter.writerow(line[0])
-    # with open('probs_results_improved.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(probs)
-    #     for line in probs_results:
-    #         csvwriter.writerow(line[1])
-    #
-    # ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
-    # with open('ntraces_results_naive.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(nstraces)
-    #     for line in ntraces_results:
-    #         csvwriter.writerow(line[0])
-    # with open('ntraces_results_improved.csv', 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-    #     csvwriter.writerow(nstraces)
-    #     for line in ntraces_results:
-    #         csvwriter.writerow(line[1])
+    probs_results = [probability_experiment(probs) for i in range(ntests)]
+    print_to_csv(probs_results, 'probs')
 
-    ############################################################################
-    ############################################################################
-    ############################################################################
+    ntraces_results = [ntraces_experiment(nstraces) for i in range(ntests)]
+    print_to_csv(ntraces_results, 'ntraces')
+
     length_results = [length_experiment(lengths) for i in range(ntests)]
-    with open('lengths_results_naive.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(lengths)
-        for line in length_results:
-            csvwriter.writerow(line[0])
-    with open('lengths_results_improved.csv', 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        csvwriter.writerow(lengths)
-        for line in length_results:
-            csvwriter.writerow(line[1])
+    print_to_csv(length_results, 'lengths')
 
     for logfile in reallife_logs:
         reallife_results = [reallife_experiments(logfile, reallife_probs) for i in range(ntests)]
-        with open(logfile + '_results_naive.csv', 'w') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-            csvwriter.writerow(reallife_probs)
-            for line in reallife_results:
-                csvwriter.writerow(line[0])
-        with open(logfile + '_results_improved.csv', 'w') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-            csvwriter.writerow(reallife_probs)
-            for line in reallife_results:
-                csvwriter.writerow(line[1])
-
+        print_to_csv(reallife_results, logfile)
