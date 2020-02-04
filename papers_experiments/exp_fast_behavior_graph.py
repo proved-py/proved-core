@@ -7,7 +7,7 @@ from datetime import timedelta
 from pm4py.objects.log.log import Trace, Event
 from pm4py.objects.log.importer.xes import factory as xes_import_factory
 
-from proved.artifacts.behavior_graph import behavior_graph
+from proved.artifacts.behavior_graph import behavior_graph, tr_behavior_graph
 
 
 def create_log(numtraces, lentraces, p_u_time):
@@ -59,7 +59,7 @@ def probability_experiment(probs):
         log = create_log(fixed_ntraces, fixed_length, p_u_time)
         a = time.process_time()
         for trace in log:
-            bg = behavior_graph.TRBehaviorGraph(trace)
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
         naive_times.append(time.process_time() - a)
         a = time.process_time()
         for trace in log:
@@ -76,7 +76,7 @@ def ntraces_experiment(nstraces):
         log = create_log(n, fixed_length, fixed_prob)
         a = time.process_time()
         for trace in log:
-            bg = behavior_graph.TRBehaviorGraph(trace)
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
         naive_times.append(time.process_time() - a)
         a = time.process_time()
         for trace in log:
@@ -93,7 +93,7 @@ def length_experiment(lengths):
         log = create_log(fixed_ntraces, length, fixed_prob)
         a = time.process_time()
         for trace in log:
-            bg = behavior_graph.TRBehaviorGraph(trace)
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
         naive_times.append(time.process_time() - a)
         a = time.process_time()
         for trace in log:
@@ -111,7 +111,7 @@ def reallife_experiments(logfile, probs):
         introduce_uncertainty(log, p_u_time)
         a = time.process_time()
         for trace in log:
-            bg = behavior_graph.TRBehaviorGraph(trace)
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
         naive_times.append(time.process_time() - a)
         a = time.process_time()
         for trace in log:
