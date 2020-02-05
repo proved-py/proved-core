@@ -1,18 +1,17 @@
-import pm4pycvxopt
 from pm4py.objects.petri.utils import acyclic_net_variants
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply_trace_net
 
-from proved.algorithms.conformance.alignments.utils import construct_uncertain_trace_net
+from proved.artifacts.behavior_graph import tr_behavior_graph
+from proved.artifacts.behavior_graph import utils
 
 
-# TODO: quite naïve. Should first obtain behavior graphs, and compute alignments only once for traces with similar graphs
 def alignment_bounds_su_log(u_log, petri_net, initial_marking, final_marking, parameters=None):
     return [alignment_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters) for u_trace in u_log]
 
 
 def alignment_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters=None):
-    trace_net, tn_i, tn_f = construct_uncertain_trace_net(u_trace)
+    trace_net, tn_i, tn_f = utils.build_behavior_net(tr_behavior_graph.TRBehaviorGraph(u_trace))
     return (alignment_lower_bound_su_trace(trace_net, tn_i, tn_f, petri_net, initial_marking, final_marking, parameters),
             alignment_upper_bound_su_trace_bruteforce(trace_net, tn_i, tn_f, petri_net, initial_marking, final_marking, parameters))
 
