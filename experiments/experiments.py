@@ -161,8 +161,7 @@ def print_to_csv(results, filename):
 if __name__ == '__main__':
 
     probs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
-    nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500,
-                9000, 9500, 10000]
+    nstraces = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
     lengths = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]
     reallife_probs = [0, .4, .8]
     reallife_logs = [os.path.join('experiments', 'BPI_Challenge_2012.xes'), os.path.join('experiments', 'Help_Desk_event_log.xes'), os.path.join('experiments', 'Road_Traffic_Fine_Management_Process.xes')]
