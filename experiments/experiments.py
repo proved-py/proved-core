@@ -1,3 +1,4 @@
+import os.path
 import random
 import time
 import csv
@@ -164,7 +165,7 @@ if __name__ == '__main__':
                 9000, 9500, 10000]
     lengths = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]
     reallife_probs = [0, .4, .8]
-    reallife_logs = ['BPI_Challenge_2012.xes', 'Help_Desk_event_log.xes', 'Road_Traffic_Fine_Management_Process.xes']
+    reallife_logs = [os.path.join('experiments', 'BPI_Challenge_2012.xes'), os.path.join('experiments', 'Help_Desk_event_log.xes'), os.path.join('experiments', 'Road_Traffic_Fine_Management_Process.xes')]
 
     random.seed(123456)
 
