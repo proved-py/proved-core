@@ -1,7 +1,5 @@
 from pm4py.objects import petri
 
-from proved.artifacts.behavior_graph import behavior_graph
-
 
 def build_behavior_net(bg):
     behavior_net = petri.petrinet.PetriNet()
@@ -12,9 +10,8 @@ def build_behavior_net(bg):
 
     # Creating transitions for each node in the graph
     node_trans = {}
-    # TODO: should the name of a transition be unique? If not, we do not need i
     for i, node in enumerate(bg.nodes):
-        transition_set = {petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity_label, activity_label) for activity_label in node}
+        transition_set = {petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + activity_label, activity_label) for _, activity_label in node}
         node_trans[id(node)] = transition_set
         for transition in transition_set:
             behavior_net.transitions.add(transition)
