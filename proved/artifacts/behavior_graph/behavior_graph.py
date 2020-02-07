@@ -6,7 +6,7 @@ import proved.xes_keys as xes_keys
 
 class BehaviorGraph(DiGraph):
 
-    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
 
         timestamps_list = []
@@ -27,11 +27,11 @@ class BehaviorGraph(DiGraph):
             nodes_list.append(new_node)
 
             # Fill in the timestamps list
-            if u_timestamp_left not in event:
+            if u_timestamp_min not in event:
                 timestamps_list.append((event[timestamp_key], new_node, 'CERTAIN'))
             else:
-                timestamps_list.append((event[u_timestamp_left], new_node, 'LEFT'))
-                timestamps_list.append((event[u_timestamp_right], new_node, 'RIGHT'))
+                timestamps_list.append((event[u_timestamp_min], new_node, 'LEFT'))
+                timestamps_list.append((event[u_timestamp_max], new_node, 'RIGHT'))
 
         # Sort timestamps_list by first term of its elements
         timestamps_list.sort()
