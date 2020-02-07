@@ -5,9 +5,7 @@ from pm4py.objects.log.util import xes
 import proved.xes_keys as xes_keys
 
 
-def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
-            u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY,
-            u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY):
+def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_left=xes_keys.DEFAULT_U_TIMESTAMP_LEFT_KEY, u_timestamp_right=xes_keys.DEFAULT_U_TIMESTAMP_RIGHT_KEY):
     if u_timestamp_right in event1:
         if u_timestamp_left in event2:
             return event1[u_timestamp_right] < event2[u_timestamp_left]
@@ -21,8 +19,7 @@ def ordered(event1, event2, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY,
 
 
 class TRBehaviorGraph(DiGraph):
-    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY,
-                 u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
 
         bg = DiGraph()

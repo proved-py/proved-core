@@ -1,7 +1,7 @@
 from pm4py.objects import petri
 
 
-def build_behavior_net(bg):
+def build_behavior_net(behavior_graph):
     behavior_net = petri.petrinet.PetriNet()
 
     source_place = petri.petrinet.PetriNet.Place('source')
@@ -18,21 +18,21 @@ def build_behavior_net(bg):
 
     # Creating transitions for each node in the graph
     node_trans = {}
-    for i, node in enumerate(bg.nodes):
+    for i, node in enumerate(behavior_graph.nodes):
         transition_set = {petri.petrinet.PetriNet.Transition('t' + str(i) + '_' + str(activity_label), activity_label) for activity_label in node[1]}
         node_trans[id(node)] = transition_set
         for transition in transition_set:
             behavior_net.transitions.add(transition)
 
-    for i, node_from in enumerate(bg.nodes):
-        if not next(bg.predecessors(node_from), None):
+    for i, node_from in enumerate(behavior_graph.nodes):
+        if not next(behavior_graph.predecessors(node_from), None):
             for transition in node_trans[id(node_from)]:
                 place_from_source = petri.petrinet.PetriNet.Place('source_to_' + str(transition.label) + '_of_' + str(id(node_from)))
                 behavior_net.places.add(place_from_source)
                 petri.utils.add_arc_from_to(source_trans, place_from_source, behavior_net)
                 petri.utils.add_arc_from_to(place_from_source, transition, behavior_net)
 
-        for node_to in bg.successors(node_from):
+        for node_to in behavior_graph.successors(node_from):
             place = petri.petrinet.PetriNet.Place(str(id(node_from)) + str(id(node_to)))
             behavior_net.places.add(place)
             for transition in node_trans[id(node_from)]:
@@ -40,7 +40,7 @@ def build_behavior_net(bg):
             for transition in node_trans[id(node_to)]:
                 petri.utils.add_arc_from_to(place, transition, behavior_net)
 
-        if not next(bg.successors(node_from), None):
+        if not next(behavior_graph.successors(node_from), None):
             for transition in node_trans[id(node_from)]:
                 place_to_sink = petri.petrinet.PetriNet.Place(str(transition.label) + '_of_' + str(id(node_from)) + '_to_sink')
                 behavior_net.places.add(place_to_sink)
