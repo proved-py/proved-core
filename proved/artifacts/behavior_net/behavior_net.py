@@ -2,6 +2,7 @@ from pm4py.objects import petri
 
 
 class BehaviorNet(petri.petrinet.PetriNet):
+
     def __init__(self, behavior_graph):
         petri.petrinet.PetriNet.__init__(self)
 
