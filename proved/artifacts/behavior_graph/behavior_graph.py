@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from networkx import DiGraph
 from pm4py.objects.log.util import xes
 
@@ -20,14 +18,14 @@ class BehaviorGraph(DiGraph):
         for i, event in enumerate(trace):
             if u_activity_key not in event:
                 if u_missing not in event:
-                    new_node = frozenset((i, tuple([event[activity_key]])))
+                    new_node = (i, frozenset(event[activity_key]))
                 else:
-                    new_node = frozenset((i, tuple([event[activity_key], None])))
+                    new_node = (i, frozenset([event[activity_key], None]))
             else:
                 if u_missing not in event:
-                    new_node = frozenset((i, tuple(event[u_activity_key]['children'])))
+                    new_node = (i, frozenset(event[u_activity_key]['children']))
                 else:
-                    new_node = frozenset((i, tuple(event[u_activity_key]['children'] + [None])))
+                    new_node = (i, frozenset(event[u_activity_key]['children'] + [None]))
 
             nodes_list.append(new_node)
 
@@ -41,18 +39,8 @@ class BehaviorGraph(DiGraph):
         # Sort timestamps_list by first term of its elements
         timestamps_list.sort()
 
-        # Adding events 'Start' and 'End' in the list
-        start = frozenset(['start'])
-        nodes_list.append(start)
-        self.__root = start
-        end = frozenset(['end'])
-        nodes_list.append(end)
-
         # Adding the nodes to the graph object
         self.add_nodes_from(nodes_list)
-
-        timestamps_list.insert(0, (datetime.min, start, 'CERTAIN'))
-        timestamps_list.append((datetime.max, end, 'CERTAIN'))
 
         for i, timestamp1 in enumerate(timestamps_list):
             if timestamp1[2] != 'LEFT':
@@ -68,8 +56,3 @@ class BehaviorGraph(DiGraph):
 
         # Adding the edges to the graph object
         self.add_edges_from(edges_list)
-
-    def __get_root(self):
-        return self.__root
-
-    root = property(__get_root)
