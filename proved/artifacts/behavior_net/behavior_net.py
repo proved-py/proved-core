@@ -2,10 +2,16 @@ from pm4py.objects import petri
 
 
 class BehaviorNet(petri.petrinet.PetriNet):
+    """
+    Class that represetn a behavior net, a sound workflow Petri net that can replay all realizations of an uncertain trace.
+    For more information refer to:
+        Pegoraro, Marco, and Wil MP van der Aalst. "Mining uncertain event data in process mining." 2019 International Conference on Process Mining (ICPM). IEEE, 2019.
+    """
 
     def __init__(self, behavior_graph):
         petri.petrinet.PetriNet.__init__(self)
 
+        # Creating sink and source place, and invisible transitions connecting them to the rest of the net
         source_place = petri.petrinet.PetriNet.Place('source')
         self.places.add(source_place)
         source_trans = petri.petrinet.PetriNet.Transition('t_source', None)
@@ -27,6 +33,7 @@ class BehaviorNet(petri.petrinet.PetriNet):
                 self.transitions.add(transition)
 
         for i, node_from in enumerate(behavior_graph.nodes):
+            # Each activity that can start the trace have to be connected through an AND-split to the starting invisible transition
             if not next(behavior_graph.predecessors(node_from), None):
                 for transition in node_trans[id(node_from)]:
                     place_from_source = petri.petrinet.PetriNet.Place('source_to_' + str(transition.label) + '_of_' + str(id(node_from)))
@@ -34,6 +41,8 @@ class BehaviorNet(petri.petrinet.PetriNet):
                     petri.utils.add_arc_from_to(source_trans, place_from_source, self)
                     petri.utils.add_arc_from_to(place_from_source, transition, self)
 
+            # Every arc in the behavior graph is translated to a place in the behavior net, describing the precedence relationship between nodes
+            # For each successor of the current node, all the transitions of the current node are connected to all the transitions in the successor through a place
             for node_to in behavior_graph.successors(node_from):
                 place = petri.petrinet.PetriNet.Place(str(id(node_from)) + str(id(node_to)))
                 self.places.add(place)
@@ -42,6 +51,7 @@ class BehaviorNet(petri.petrinet.PetriNet):
                 for transition in node_trans[id(node_to)]:
                     petri.utils.add_arc_from_to(place, transition, self)
 
+            # Each activity that can end the trace have to be connected through an AND-join to the ending invisible transition
             if not next(behavior_graph.successors(node_from), None):
                 for transition in node_trans[id(node_from)]:
                     place_to_sink = petri.petrinet.PetriNet.Place(str(transition.label) + '_of_' + str(id(node_from)) + '_to_sink')
@@ -49,6 +59,7 @@ class BehaviorNet(petri.petrinet.PetriNet):
                     petri.utils.add_arc_from_to(transition, place_to_sink, self)
                     petri.utils.add_arc_from_to(place_to_sink, sink_trans, self)
 
+        # Initial and final markings are just one token in the source place and one token in the sink place, respectively
         self.initial_marking = petri.petrinet.Marking({source_place: 1})
         self.final_marking = petri.petrinet.Marking({sink_place: 1})
 
