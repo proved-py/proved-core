@@ -59,6 +59,7 @@ class TRBehaviorGraph(DiGraph):
                     new_node = (i, frozenset(event[u_activity_key]['children'] + [None]))
 
             nodes_list.append(new_node)
+            event_node_map[i] = new_node
 
         # Creates edges by connecting the nodes that are in order
         for i, event1 in enumerate(trace):
