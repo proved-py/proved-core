@@ -41,4 +41,4 @@ def alignment_bounds_su_trace_bruteforce(trace, petri_net, initial_marking, fina
     # Computes the lower and upper bounds for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
-    return min(alignments, key=lambda x: x['cost']), min(alignments, key=lambda x: x['cost'])
+    return min(alignments, key=lambda x: x['cost']), max(alignments, key=lambda x: x['cost'])
