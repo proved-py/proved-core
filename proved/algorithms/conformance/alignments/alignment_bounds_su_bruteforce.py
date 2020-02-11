@@ -39,13 +39,6 @@ def alignment_bounds_su_trace_bruteforce(trace, petri_net, initial_marking, fina
     realization_set = acyclic_net_variants(trace_net, trace_net.initial_marking, trace_net.final_marking)
 
     # Computes the lower and upper bounds for conformance via bruteforce on the realization set
-    best_alignment = None
-    worst_alignment = None
-    for trace in realization_set:
-        alignment = apply(trace, petri_net, initial_marking, final_marking, parameters)
-        if alignment['cost'] < best_alignment['cost']:
-            best_alignment = alignment
-        if alignment['cost'] > worst_alignment['cost']:
-            worst_alignment = alignment
+    alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
-    return best_alignment, worst_alignment
+    return min(alignments, key=lambda x: x['cost']), min(alignments, key=lambda x: x['cost'])
