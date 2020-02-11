@@ -2,7 +2,7 @@ from pm4py.objects.petri.utils import acyclic_net_variants
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply_trace_net
 
-from proved.artifacts.behavior_graph import tr_behavior_graph
+from proved.artifacts.behavior_graph import behavior_graph
 from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
 
 
@@ -34,7 +34,7 @@ def alignment_bounds_su_trace(trace, petri_net, initial_marking, final_marking, 
     """
 
     # Obtains the behavior net of the trace
-    behavior_net = behavior_net_builder.BehaviorNet(tr_behavior_graph.TRBehaviorGraph(trace))
+    behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
 
     return (alignment_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters),
             alignment_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters))
