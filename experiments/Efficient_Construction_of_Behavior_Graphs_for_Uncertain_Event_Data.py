@@ -1,3 +1,8 @@
+"""
+Experiments for the paper
+    Pegoraro, Marco, Merih Seran Uysal, and Wil MP van der Aalst. "Efficient Construction of Behavior Graphs for Uncertain Event Data"
+"""
+
 import os.path
 import random
 import time
