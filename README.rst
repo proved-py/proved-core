@@ -1,37 +1,15 @@
 ======
-proved
+PROVED (PRocess mining OVer uncErtain Data)
 ======
 
+Branch dedicated to the experiments for the paper
+**"Efficient Construction of Behavior Graphs for Uncertain Event Data"**  
+Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst  
+In _International Conference on Business Information Systems (BIS)_, 2020.
 
-.. image:: https://img.shields.io/pypi/v/proved.svg
-        :target: https://pypi.python.org/pypi/proved
+Experiments are in the folder `experiments`.
 
-.. image:: https://img.shields.io/travis/marcopegoraro/proved.svg
-        :target: https://travis-ci.org/marcopegoraro/proved
-
-.. image:: https://readthedocs.org/projects/proved/badge/?version=latest
-        :target: https://proved.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
-
-PROVED (PRocess mining OVer uncErtain Data) is a collection of tools to perform process mining on uncertain event data.
-
+For more information see http://mpegoraro.net/pages/research.html
 
 * Free software: GNU General Public License v3
-* Documentation: TODO
-
-
-Features
---------
-
-* TODO
-
-Credits
--------
-
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+* Documentation: see https://github.com/proved-py/proved-core
