@@ -20,13 +20,13 @@ PROVED (PRocess mining OVer uncErtain Data) is a collection of tools to perform 
 
 
 * Free software: GNU General Public License v3
-* Documentation: TODO
+* Documentation: Coming soon!
 
 
 Features
 --------
 
-* TODO
+* Coming soon!
 
 Credits
 -------
