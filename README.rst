@@ -3,9 +3,12 @@ PROVED (PRocess mining OVer uncErtain Data)
 ======
 
 Branch dedicated to the experiments for the paper
-**"Efficient Construction of Behavior Graphs for Uncertain Event Data"**  
-Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst  
-In __International Conference on Business Information Systems (BIS)__, 2020.
+
+**"Efficient Construction of Behavior Graphs for Uncertain Event Data"**
+
+Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst
+
+In *International Conference on Business Information Systems (BIS)*, 2020.
 
 Experiments are in the folder experiments.
 
