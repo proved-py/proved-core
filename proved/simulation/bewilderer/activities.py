@@ -39,7 +39,7 @@ def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activit
     if p > 0:
         for event in trace:
             to_add = 0
-            while random() < p:
+            while random() < p and to_add <= len(label_set):
                 to_add += 1
             to_add = min(to_add, max_labels)
             if to_add > 0:
