@@ -1,9 +1,9 @@
 from random import random
 
-import proved.xes_keys as xes_keys
+from proved.xes_keys import DEFAULT_U_MISSING_KEY
 
 
-def add_indeterminate_events_to_log(log, p, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY):
+def add_indeterminate_events_to_log(log, p, u_missing_key=DEFAULT_U_MISSING_KEY):
     """
     Turns events in an event log into indeterminate events with a certain probability.
 
@@ -16,7 +16,7 @@ def add_indeterminate_events_to_log(log, p, u_missing_key=xes_keys.DEFAULT_U_MIS
         add_indeterminate_events_to_trace(trace, p, u_missing_key)
 
 
-def add_indeterminate_events_to_trace(trace, p, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY):
+def add_indeterminate_events_to_trace(trace, p, u_missing_key=DEFAULT_U_MISSING_KEY):
     """
     Turns events in an trace into indeterminate events with a certain probability.
 

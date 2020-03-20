@@ -2,10 +2,10 @@ from random import random, sample
 
 from pm4py.objects.log.util.xes import DEFAULT_NAME_KEY
 
-import proved.xes_keys as xes_keys
+from proved.xes_keys import DEFAULT_U_NAME_KEY
 
 
-def add_uncertain_activities_to_log(log, p, label_set, max_labels=0, activity_key=DEFAULT_NAME_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def add_uncertain_activities_to_log(log, p, label_set, max_labels=0, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
     """
     Adds possible activity labels to events in an event log with a certain probability, up to a maximum.
 
@@ -21,7 +21,7 @@ def add_uncertain_activities_to_log(log, p, label_set, max_labels=0, activity_ke
         add_uncertain_activities_to_trace(trace, p, label_set, max_labels, activity_key, u_activity_key)
 
 
-def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activity_key=DEFAULT_NAME_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
     """
     Adds possible activity labels to events in a trace with a certain probability, up to a maximum.
 
