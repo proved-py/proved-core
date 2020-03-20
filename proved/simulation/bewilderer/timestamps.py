@@ -1,4 +1,4 @@
-from random import random, sample
+from random import random
 
 from pm4py.objects.log.util.xes import DEFAULT_TIMESTAMP_KEY
 
