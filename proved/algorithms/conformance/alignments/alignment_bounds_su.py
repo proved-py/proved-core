@@ -60,7 +60,7 @@ def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     # Computes the upper bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
-    return min(alignments, key=lambda x: x['cost'])
+    return max(alignments, key=lambda x: x['cost'])
 
 
 def alignment_lower_bound_su_trace(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
