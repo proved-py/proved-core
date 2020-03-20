@@ -11,7 +11,7 @@ class BehaviorGraph(DiGraph):
         Pegoraro, Marco, and Wil MP van der Aalst. "Mining uncertain event data in process mining." 2019 International Conference on Process Mining (ICPM). IEEE, 2019.
     """
 
-    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+    def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         DiGraph.__init__(self)
 
         timestamps_list = []
@@ -21,12 +21,12 @@ class BehaviorGraph(DiGraph):
         # Creates all the nodes in the graph
         for i, event in enumerate(trace):
             if u_activity_key not in event:
-                if u_missing not in event:
+                if u_missing_key not in event:
                     new_node = (i, frozenset(event[activity_key]))
                 else:
                     new_node = (i, frozenset([event[activity_key], None]))
             else:
-                if u_missing not in event:
+                if u_missing_key not in event:
                     new_node = (i, frozenset(event[u_activity_key]['children']))
                 else:
                     new_node = (i, frozenset(event[u_activity_key]['children'] + [None]))
@@ -34,11 +34,11 @@ class BehaviorGraph(DiGraph):
             nodes_list.append(new_node)
 
             # Fill in the timestamps list
-            if u_timestamp_min not in event:
+            if u_timestamp_min_key not in event:
                 timestamps_list.append((event[timestamp_key], new_node, 'CERTAIN'))
             else:
-                timestamps_list.append((event[u_timestamp_min], new_node, 'LEFT'))
-                timestamps_list.append((event[u_timestamp_max], new_node, 'RIGHT'))
+                timestamps_list.append((event[u_timestamp_min_key], new_node, 'LEFT'))
+                timestamps_list.append((event[u_timestamp_max_key], new_node, 'RIGHT'))
 
         # Sort timestamps_list by first term of its elements
         timestamps_list.sort()
