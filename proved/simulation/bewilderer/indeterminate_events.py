@@ -12,8 +12,10 @@ def add_indeterminate_events_to_log(log, p, u_missing_key=DEFAULT_U_MISSING_KEY)
     :param u_missing_key: the xes key for indeterminate events
     :return:
     """
-    for trace in log:
-        add_indeterminate_events_to_trace(trace, p, u_missing_key)
+
+    if p > 0:
+        for trace in log:
+            add_indeterminate_events_to_trace(trace, p, u_missing_key)
 
 
 def add_indeterminate_events_to_trace(trace, p, u_missing_key=DEFAULT_U_MISSING_KEY):
@@ -25,6 +27,8 @@ def add_indeterminate_events_to_trace(trace, p, u_missing_key=DEFAULT_U_MISSING_
     :param u_missing_key: the xes key for indeterminate events
     :return:
     """
-    for event in trace:
-        if random() < p:
-            event[u_missing_key] = 1
+
+    if p > 0:
+        for event in trace:
+            if random() < p:
+                event[u_missing_key] = 1

@@ -17,8 +17,10 @@ def add_uncertain_activities_to_log(log, p, label_set, max_labels=0, activity_ke
     :param u_activity_key: the xes key for uncertain activity labels
     :return:
     """
-    for trace in log:
-        add_uncertain_activities_to_trace(trace, p, label_set, max_labels, activity_key, u_activity_key)
+
+    if p > 0:
+        for trace in log:
+            add_uncertain_activities_to_trace(trace, p, label_set, max_labels, activity_key, u_activity_key)
 
 
 def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
@@ -33,10 +35,12 @@ def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activit
     :param u_activity_key: the xes key for uncertain activity labels
     :return:
     """
-    for event in trace:
-        to_add = 0
-        while random() < p:
-            to_add += 1
-        to_add = min(to_add, max_labels)
-        if to_add > 0:
-            event[u_activity_key]['children'] = event[activity_key] + sample(label_set - {event[activity_key]}, to_add)
+
+    if p > 0:
+        for event in trace:
+            to_add = 0
+            while random() < p:
+                to_add += 1
+            to_add = min(to_add, max_labels)
+            if to_add > 0:
+                event[u_activity_key]['children'] = event[activity_key] + sample(label_set - {event[activity_key]}, to_add)
