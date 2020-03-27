@@ -41,7 +41,11 @@ def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activit
             to_add = 0
             if max_labels == 0 or max_labels > len(label_set):
                 max_labels = len(label_set)
-            while random() < p and to_add <= max_labels:
+            while random() < p and to_add < max_labels:
                 to_add += 1
             if to_add > 0:
-                event[u_activity_key]['children'] = event[activity_key] + sample(label_set - {event[activity_key]}, to_add)
+                if u_activity_key not in event:
+                    event[u_activity_key] = dict()
+                    event[u_activity_key]['children'] = {activity_label: 0 for activity_label in [event[activity_key]] + sample(label_set - {event[activity_key]}, to_add)}
+                else:
+                    event[u_activity_key]['children'].update({activity_label: 0 for activity_label in [event[activity_key]] + sample(label_set - {event[activity_key]}, to_add)})

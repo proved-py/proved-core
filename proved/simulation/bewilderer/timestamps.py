@@ -44,9 +44,9 @@ def add_uncertain_timestamp_to_trace_relative(trace, p_left, p_right, max_overla
         for i in range(trace):
             steps_left = 0
             steps_right = 0
-            while random() < p_left and steps_left <= min(max_overlap_left, i):
+            while random() < p_left and steps_left < min(max_overlap_left, i):
                 steps_left += 1
-            while random() < p_right and steps_right <= min(max_overlap_right, len(trace) - i - 1):
+            while random() < p_right and steps_right < min(max_overlap_right, len(trace) - i - 1):
                 steps_right += 1
             trace[i][u_timestamp_min_key] = trace[i - steps_left][timestamp_key]
             trace[i][u_timestamp_max_key] = trace[i + steps_right][timestamp_key]
