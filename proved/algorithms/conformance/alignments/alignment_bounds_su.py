@@ -78,3 +78,26 @@ def alignment_lower_bound_su_trace(behavior_net, bn_i, bn_f, petri_net, initial_
     """
 
     return apply_trace_net(petri_net, initial_marking, final_marking, behavior_net, bn_i, bn_f, parameters)
+
+
+def alignment_lower_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower bound for conformance of a strongly uncertain trace against a reference Petri net by aligning all possible realizations.
+
+    :param behavior_net: the behavior net of a strongly uncertain trace
+    :param bn_i: the initial marking of the behavior net
+    :param bn_f: the final marking of the behavior net
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: the alignment results for the upper bound for conformance of the trace
+    """
+
+    # Obtains all the realizations of the trace by executing all possible variants from the behavior net
+    realization_set = acyclic_net_variants(behavior_net, bn_i, bn_f)
+
+    # Computes the upper bound for conformance via bruteforce on the realization set
+    alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
+
+    return min(alignments, key=lambda x: x['cost'])
