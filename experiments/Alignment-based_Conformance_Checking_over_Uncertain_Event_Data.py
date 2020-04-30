@@ -83,56 +83,31 @@ def experiment_qualitative_activity(data_qualitative):
     pass
 
 
-def experiment_quantative_activity(data_quantitative, activity_key=xes_key.DEFAULT_NAME_KEY):
-    for (_, log) in data_quantitative:
-        # Adding uncertainty
-        label_set = set()
-        for trace in log:
-            for event in trace:
-                label_set.add(event[activity_key])
-        add_uncertain_activities_to_log(log, FIXED_PROB, label_set)
-
-    return time_test(data_quantitative)
-
-
 def experiment_qualitative_timestamp(data_qualitative):
     pass
-
-
-def experiment_quantitative_timestamp(data_quantitative):
-    for (_, log) in data_quantitative:
-        # Adding uncertainty
-        add_uncertain_timestamp_to_log_relative(log, FIXED_PROB, FIXED_PROB)
-
-    return time_test(data_quantitative)
 
 
 def experiment_qualitative_indeterminate_event(data_qualitative):
     pass
 
 
-def experiment_quantitative_indeterminate_event(data_quantitative):
-    for (_, log) in data_quantitative:
-        # Adding uncertainty
-        add_indeterminate_events_to_log(log, FIXED_PROB)
-
-    return time_test(data_quantitative)
-
-
 def experiment_qualitative_indeterminate_all(data_qualitative):
     pass
 
 
-def experiment_quantitative_indeterminate_all(data_quantitative, activity_key=xes_key.DEFAULT_NAME_KEY):
+def experiment_quantitative(data_quantitative, p_a=0.0, p_t=0.0, p_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
     for (_, log) in data_quantitative:
         # Adding uncertainty
-        label_set = set()
-        for trace in log:
-            for event in trace:
-                label_set.add(event[activity_key])
-        add_uncertain_activities_to_log(log, FIXED_PROB, label_set)
-        add_uncertain_timestamp_to_log_relative(log, FIXED_PROB, FIXED_PROB)
-        add_indeterminate_events_to_log(log, FIXED_PROB)
+        if p_a > 0.0:
+            label_set = set()
+            for trace in log:
+                for event in trace:
+                    label_set.add(event[activity_key])
+            add_uncertain_activities_to_log(log, p_a, label_set)
+        if p_t > 0.0:
+            add_uncertain_timestamp_to_log_relative(log, p_t, p_t)
+        if p_i > 0.0:
+            add_indeterminate_events_to_log(log, p_i)
 
     return time_test(data_quantitative)
 
@@ -142,7 +117,7 @@ def run_tests():
     trees = [treegen.apply(), treegen.apply(), treegen.apply()]
     data_qualitative = [(pt_conv_factory.apply(tree), semantics.generate_log(tree, no_traces=250)) for tree in trees]
     data_quantitative = [(pt_conv_factory.apply(tree), semantics.generate_log(tree, no_traces=100)) for tree in trees]
-    print(experiment_quantative_activity(data_quantitative))
+    print(experiment_quantitative(data_quantitative, FIXED_PROB, FIXED_PROB, FIXED_PROB))
     # TODO: da passare in copia!
 
 
