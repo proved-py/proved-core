@@ -14,14 +14,14 @@ from proved.simulation.bewilderer.timestamps import add_uncertain_timestamp_to_l
 from proved.simulation.bewilderer.indeterminate_events import add_indeterminate_events_to_log
 from proved.artifacts.behavior_graph import behavior_graph
 from proved.artifacts.behavior_net import behavior_net
-from proved.algorithms.conformance.alignments.alignment_bounds_su import alignment_lower_bound_su_trace, alignment_lower_bound_su_trace_bruteforce, alignment_upper_bound_su_trace_bruteforce
+from proved.algorithms.conformance.alignments.alignment_bounds_su import alignment_bounds_su_log, alignment_lower_bound_su_trace, alignment_lower_bound_su_trace_bruteforce, alignment_upper_bound_su_trace_bruteforce
 
 random.seed(123456)
 
 FIXED_PROB = .05
 
 
-def add_deviations(log, p_a, p_s, p_d, activity_key=xes_key.DEFAULT_NAME_KEY, timestamp_key=xes_key.DEFAULT_TIMESTAMP_KEY):
+def add_deviations(log, p_a=0.0, p_s=0.0, p_d=0.0, activity_key=xes_key.DEFAULT_NAME_KEY, timestamp_key=xes_key.DEFAULT_TIMESTAMP_KEY):
     # Receives a log, and the probabilities to add deviations
     # p_a: probability of changing the activity label
     # p_s: probability of swapping timestamps between events
@@ -35,19 +35,19 @@ def add_deviations(log, p_a, p_s, p_d, activity_key=xes_key.DEFAULT_NAME_KEY, ti
 
     for trace in log:
 
-        # Adding deviations on activities
+        # Adding deviations on activities: alters the activity labels with a certain probability
         for event in trace:
             if random() < p_a:
                 event[activity_key] = choice(label_set - {event[activity_key]})
 
-        #Adding swaps
+        # Adding swaps: swaps consecutive events with a certain probability
         for i in range(len(trace) - 1):
             if random() < p_s:
                 temp = trace[i][timestamp_key]
                 trace[i][timestamp_key] = trace[i + 1][timestamp_key]
                 trace[i + 1][timestamp_key] = temp
 
-        # Adding extra events
+        # Adding extra events: duplicates events with a certain probability
         to_add = 0
         while random() < p_d and to_add < len(trace):
             to_add += 1
@@ -79,38 +79,46 @@ def time_test(data_quantitative):
     return timing_naive, timing_improved
 
 
-def experiment_qualitative_activity(data_qualitative):
-    pass
-
-
-def experiment_qualitative_timestamp(data_qualitative):
-    pass
-
-
-def experiment_qualitative_indeterminate_event(data_qualitative):
-    pass
-
-
-def experiment_qualitative_indeterminate_all(data_qualitative):
-    pass
-
-
-def experiment_quantitative(data_quantitative, p_a=0.0, p_t=0.0, p_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
-    for (_, log) in data_quantitative:
+def experiment_qualitative(data_qualitative, dev_a=0.0, dev_s=0.0, dev_d=0.0, unc_a=0.0, unc_t=0.0, unc_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
+    for (_, log) in data_qualitative:
+        # Adding deviations
+        add_deviations(log, dev_a, dev_s, dev_d)
         # Adding uncertainty
-        if p_a > 0.0:
+        if unc_a > 0.0:
             label_set = set()
             for trace in log:
                 for event in trace:
                     label_set.add(event[activity_key])
-            add_uncertain_activities_to_log(log, p_a, label_set)
-        if p_t > 0.0:
-            add_uncertain_timestamp_to_log_relative(log, p_t, p_t)
-        if p_i > 0.0:
-            add_indeterminate_events_to_log(log, p_i)
+            add_uncertain_activities_to_log(log, unc_a, label_set)
+        if unc_t > 0.0:
+            add_uncertain_timestamp_to_log_relative(log, unc_t, unc_t)
+        if unc_i > 0.0:
+            add_indeterminate_events_to_log(log, unc_i)
+
+    return [alignment_bounds_su_log(log, net, im, fm) for ((net, im, fm), log) in data_qualitative]
+
+
+def experiment_quantitative(data_quantitative, unc_a=0.0, unc_t=0.0, unc_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
+    for (_, log) in data_quantitative:
+        # Adding uncertainty
+        if unc_a > 0.0:
+            label_set = set()
+            for trace in log:
+                for event in trace:
+                    label_set.add(event[activity_key])
+            add_uncertain_activities_to_log(log, unc_a, label_set)
+        if unc_t > 0.0:
+            add_uncertain_timestamp_to_log_relative(log, unc_t, unc_t)
+        if unc_i > 0.0:
+            add_indeterminate_events_to_log(log, unc_i)
 
     return time_test(data_quantitative)
 
+def qualitative_output(results):
+    pass
+
+def quantitative_output(results):
+    pass
 
 def run_tests():
     # TODO: ask Alessandro for the recursion parameter
