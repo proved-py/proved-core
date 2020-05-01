@@ -79,23 +79,39 @@ def time_test(data_quantitative):
     return timing_naive, timing_improved
 
 
-def experiment_qualitative(data_qualitative, dev_a=0.0, dev_s=0.0, dev_d=0.0, unc_a=0.0, unc_t=0.0, unc_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
-    for (_, log) in data_qualitative:
+def experiment_qualitative(net, im, fm, log, unc_a, unc_t, unc_i, dev_a=0.0, dev_s=0.0, dev_d=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
+    # for (_, log) in data_qualitative:
+    label_set = set()
+    for trace in log:
+        for event in trace:
+            label_set.add(event[activity_key])
+    uncertainlogs = []
+    for i in range(len(unc_a)):
+        uncertainlog = copy(log)
         # Adding deviations
-        add_deviations(log, dev_a, dev_s, dev_d)
+        add_deviations(uncertainlog, dev_a, dev_s, dev_d)
         # Adding uncertainty
-        if unc_a > 0.0:
-            label_set = set()
-            for trace in log:
-                for event in trace:
-                    label_set.add(event[activity_key])
-            add_uncertain_activities_to_log(log, unc_a, label_set)
-        if unc_t > 0.0:
-            add_uncertain_timestamp_to_log_relative(log, unc_t, unc_t)
-        if unc_i > 0.0:
-            add_indeterminate_events_to_log(log, unc_i)
+        if unc_a[i] > 0.0:
+            add_uncertain_activities_to_log(uncertainlog, unc_a[i], label_set)
+        if unc_t[i] > 0.0:
+            add_uncertain_timestamp_to_log_relative(uncertainlog, unc_t[i], unc_t[i])
+        if unc_i[i] > 0.0:
+            add_indeterminate_events_to_log(uncertainlog, unc_i[i])
+        uncertainlogs.append(uncertainlog)
 
-    return [alignment_bounds_su_log(log, net, im, fm) for ((net, im, fm), log) in data_qualitative]
+    # TODO: format rows before returning!
+    results = [alignment_bounds_su_log(uncertainlogs[i], net, im, fm) for i in range(len(unc_a))]
+    lowerboundlist = []
+    upperboundlist = []
+    for result in results:
+        sumtracedevlb = 0
+        sumtracedevub = 0
+        for traceresult in result:
+            sumtracedevlb += traceresult[0]['cost']
+            sumtracedevlb += traceresult[1]['cost']
+        lowerboundlist.append(sumtracedevlb)
+        upperboundlist.append(sumtracedevub)
+    return lowerboundlist + upperboundlist
 
 
 def experiment_quantitative(data_quantitative, unc_a=0.0, unc_t=0.0, unc_i=0.0, activity_key=xes_key.DEFAULT_NAME_KEY):
@@ -114,11 +130,14 @@ def experiment_quantitative(data_quantitative, unc_a=0.0, unc_t=0.0, unc_i=0.0, 
 
     return time_test(data_quantitative)
 
+
 def qualitative_output(results):
     pass
 
+
 def quantitative_output(results):
     pass
+
 
 def run_tests():
     # TODO: ask Alessandro for the recursion parameter
