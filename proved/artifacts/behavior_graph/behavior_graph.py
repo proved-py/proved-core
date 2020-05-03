@@ -29,7 +29,7 @@ class BehaviorGraph(DiGraph):
                 if u_missing_key not in event:
                     new_node = (i, frozenset(event[u_activity_key]['children']))
                 else:
-                    new_node = (i, frozenset(event[u_activity_key]['children'] + [None]))
+                    new_node = (i, frozenset(set(event[u_activity_key]['children']).union({None})))
 
             nodes_list.append(new_node)
 
