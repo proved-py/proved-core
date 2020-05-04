@@ -10,14 +10,14 @@ from pm4py.objects.conversion.process_tree import factory as pt_conv_factory
 import pm4py.objects.log.util.xes as xes_key
 from pm4py.objects.log.util import sorting
 
-from proved.simulation.bewilderer.activities import add_uncertain_activities_to_log
-from proved.simulation.bewilderer.timestamps import add_uncertain_timestamp_to_log_relative
-from proved.simulation.bewilderer.indeterminate_events import add_indeterminate_events_to_log
+from proved.simulation.bewilderer.add_activities import add_uncertain_activities_to_log
+from proved.simulation.bewilderer.add_timestamps import add_uncertain_timestamp_to_log_relative
+from proved.simulation.bewilderer.add_indeterminate_events import add_indeterminate_events_to_log
 from proved.artifacts.behavior_graph import behavior_graph
 from proved.artifacts.behavior_net import behavior_net
 from proved.algorithms.conformance.alignments.alignment_bounds_su import alignment_bounds_su_log, alignment_lower_bound_su_trace, alignment_lower_bound_su_trace_bruteforce, alignment_upper_bound_su_trace_bruteforce
 
-#seed(123456)
+seed(123456)
 
 FIXED_PROB = .05
 
@@ -28,7 +28,12 @@ def add_deviations(log, p_a=0.0, p_s=0.0, p_d=0.0, activity_key=xes_key.DEFAULT_
     # p_s: probability of swapping timestamps between events
     # p_d: probability of adding an extra event
 
+    # for trace in log:
+    #     for event in trace:
+    #         print(event)
+
     # Fetching the alphabet of activity labels
+    # if p_a > 0.0:
     label_set = set()
     for trace in log:
         for event in trace:
@@ -37,11 +42,13 @@ def add_deviations(log, p_a=0.0, p_s=0.0, p_d=0.0, activity_key=xes_key.DEFAULT_
     for trace in log:
 
         # Adding deviations on activities: alters the activity labels with a certain probability
+        # if p_a > 0.0:
         for event in trace:
             if random() < p_a:
                 event[activity_key] = choice(list(label_set - {event[activity_key]}))
 
         # Adding swaps: swaps consecutive events with a certain probability
+        # if p_s > 0.0:
         for i in range(len(trace) - 1):
             if random() < p_s:
                 temp = trace[i][timestamp_key]
@@ -49,6 +56,7 @@ def add_deviations(log, p_a=0.0, p_s=0.0, p_d=0.0, activity_key=xes_key.DEFAULT_
                 trace[i + 1][timestamp_key] = temp
 
         # Adding extra events: duplicates events with a certain probability
+        # if p_d > 0.0:
         to_add = 0
         while random() < p_d and to_add < len(trace):
             to_add += 1
@@ -61,8 +69,7 @@ def add_deviations(log, p_a=0.0, p_s=0.0, p_d=0.0, activity_key=xes_key.DEFAULT_
         for event in events_to_add:
             trace.append(event)
 
-        # TODO: does not seem to work
-        log = sorting.sort_timestamp(log)
+        return sorting.sort_timestamp(log)
 
 
 def time_test(data_quantitative):
@@ -95,7 +102,7 @@ def experiment_qualitative(net, im, fm, log, unc_a, unc_t, unc_i, dev_a=0.0, dev
     for i in range(len(unc_a)):
         uncertainlog = deepcopy(log)
         # Adding deviations
-        add_deviations(uncertainlog, dev_a, dev_s, dev_d)
+        uncertainlog = add_deviations(uncertainlog, dev_a, dev_s, dev_d)
         # Adding uncertainty
         if unc_a[i] > 0.0:
             add_uncertain_activities_to_log(uncertainlog, unc_a[i], label_set)
@@ -114,7 +121,7 @@ def experiment_qualitative(net, im, fm, log, unc_a, unc_t, unc_i, dev_a=0.0, dev
         sumtracedevub = 0
         for traceresult in result:
             sumtracedevlb += traceresult[0]['cost']
-            sumtracedevlb += traceresult[1]['cost']
+            sumtracedevub += traceresult[1]['cost']
         lowerboundlist.append(sumtracedevlb)
         upperboundlist.append(sumtracedevub)
     return lowerboundlist + upperboundlist
@@ -146,13 +153,17 @@ def quantitative_output(results):
 
 
 def run_tests():
-    trees = [treegen.apply(), treegen.apply(), treegen.apply()]
+    parameters = {'mode': 4, 'min': 4, 'max': 5}
+    trees = [treegen.apply(parameters=parameters), treegen.apply(parameters=parameters), treegen.apply(parameters=parameters)]
     data_qualitative = [(pt_conv_factory.apply(tree), semantics.generate_log(tree, no_traces=250)) for tree in trees]
     data_quantitative = [(pt_conv_factory.apply(tree), semantics.generate_log(tree, no_traces=100)) for tree in trees]
     print(experiment_quantitative(data_quantitative, FIXED_PROB, FIXED_PROB, FIXED_PROB))
-    # TODO: do pass in copy/deepcopy!
+    tree = treegen.apply(parameters=parameters)
+    net, im, fm = pt_conv_factory.apply(tree)
+    log = semantics.generate_log(tree, no_traces=10)
+    print(experiment_qualitative(net, im, fm, log, [.2, .3, .4], [.2, .3, .4], [.2, .3, .4], .3, .3, .3))
+    # TODO: pass the log in copy/deepcopy for tests!
 
 
 if __name__ == '__main__':
-    # run_tests()
-    pass
+    run_tests()
