@@ -22,7 +22,7 @@ def add_uncertain_timestamp_to_log_relative(log, p_left, p_right, max_overlap_le
     :return:
     """
 
-    if p_left > 0 or p_right > 0:
+    if p_left > 0.0 or p_right > 0.0:
         for trace in log:
             add_uncertain_timestamp_to_trace_relative(trace, p_left, p_right, max_overlap_left, max_overlap_right, timestamp_key, u_timestamp_min_key, u_timestamp_max_key)
 
@@ -42,7 +42,7 @@ def add_uncertain_timestamp_to_trace_relative(trace, p_left, p_right, max_overla
     :return:
     """
 
-    if p_left > 0 or p_right > 0:
+    if p_left > 0.0 or p_right > 0.0:
         for i in range(len(trace)):
             steps_left = 0
             steps_right = 0

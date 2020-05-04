@@ -18,7 +18,7 @@ def add_uncertain_activities_to_log(log, p, label_set, max_labels=0, activity_ke
     :return:
     """
 
-    if p > 0:
+    if p > 0.0:
         for trace in log:
             add_uncertain_activities_to_trace(trace, p, label_set, max_labels, activity_key, u_activity_key)
 
@@ -36,11 +36,14 @@ def add_uncertain_activities_to_trace(trace, p, label_set, max_labels=0, activit
     :return:
     """
 
-    if p > 0:
+    if p > 0.0:
         for event in trace:
             to_add = 0
             if max_labels == 0 or max_labels > len(label_set):
-                max_labels = len(label_set)
+                if u_activity_key not in event:
+                    max_labels = len(label_set) - 1
+                else:
+                    max_labels = len(label_set) - len(event[u_activity_key]['children'])
             while random() < p and to_add < max_labels:
                 to_add += 1
             if to_add > 0:

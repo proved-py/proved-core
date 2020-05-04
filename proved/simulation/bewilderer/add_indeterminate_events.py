@@ -13,7 +13,7 @@ def add_indeterminate_events_to_log(log, p, u_missing_key=DEFAULT_U_MISSING_KEY)
     :return:
     """
 
-    if p > 0:
+    if p > 0.0:
         for trace in log:
             add_indeterminate_events_to_trace(trace, p, u_missing_key)
 
@@ -28,7 +28,7 @@ def add_indeterminate_events_to_trace(trace, p, u_missing_key=DEFAULT_U_MISSING_
     :return:
     """
 
-    if p > 0:
+    if p > 0.0:
         for event in trace:
             if random() < p:
                 event[u_missing_key] = 1
