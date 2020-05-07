@@ -38,10 +38,10 @@ def acyclic_net_variants_new(net, initial_marking, final_marking, activity_key=D
         enabled_transitions = petri.semantics.enabled_transitions(net, curr_marking)
         for transition in enabled_transitions:
             if transition.label is not None:
-                next_activitylist = curr_partial_trace + (repr(transition),)
+                next_partial_trace = curr_partial_trace + (repr(transition),)
             else:
-                next_activitylist = curr_partial_trace
-            next_marking, next_partial_trace = petri.semantics.execute(transition, net, curr_marking), next_activitylist
+                next_partial_trace = curr_partial_trace
+            next_marking, next_partial_trace = petri.semantics.execute(transition, net, curr_marking), next_partial_trace
             hash_next_pair = hash((next_marking, next_partial_trace))
 
             if hash(next_marking) == hash_final_marking:
