@@ -41,7 +41,7 @@ def acyclic_net_variants_new(net, initial_marking, final_marking, activity_key=D
                 next_partial_trace = curr_partial_trace + (repr(transition),)
             else:
                 next_partial_trace = curr_partial_trace
-            next_marking, next_partial_trace = petri.semantics.execute(transition, net, curr_marking), next_partial_trace
+            next_marking = petri.semantics.execute(transition, net, curr_marking)
             hash_next_pair = hash((next_marking, next_partial_trace))
 
             if hash(next_marking) == hash_final_marking:
@@ -109,10 +109,15 @@ def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
+    # print('acyclic net start', flush=True)
     realization_set = acyclic_net_variants_new(behavior_net, bn_i, bn_f)
+    # print('acyclic net end', flush=True)
 
     # Computes the upper bound for conformance via bruteforce on the realization set
+    # print(len(realization_set), flush=True)
+    # print('bruteforce alignments start', flush=True)
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
+    # print('bruteforce alignments end', flush=True)
 
     return max(alignments, key=lambda x: x['cost'])
 
@@ -149,10 +154,11 @@ def alignment_lower_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
+    print('acyclic net start')
     realization_set = acyclic_net_variants_new(behavior_net, bn_i, bn_f)
+    print('acyclic net stop')
 
     # Computes the upper bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
     return min(alignments, key=lambda x: x['cost'])
-
