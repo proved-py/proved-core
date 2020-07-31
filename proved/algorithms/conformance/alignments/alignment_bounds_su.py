@@ -72,7 +72,7 @@ def alignment_bounds_su_log(log, petri_net, initial_marking, final_marking, para
     :return: a list of 2-tuples containing the alignment results for the upper and lower bounds for conformance of the traces in the log
     """
 
-    return [alignment_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters) for u_trace in log]
+    return [alignment_bounds_su_trace(trace, petri_net, initial_marking, final_marking, parameters) for trace in log]
 
 
 def alignment_bounds_su_trace(trace, petri_net, initial_marking, final_marking, parameters=None):
@@ -90,8 +90,7 @@ def alignment_bounds_su_trace(trace, petri_net, initial_marking, final_marking, 
     # Obtains the behavior net of the trace
     behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
 
-    return (alignment_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters),
-            alignment_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters))
+    return alignment_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters), alignment_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters)
 
 
 def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
@@ -109,15 +108,10 @@ def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
-    # print('acyclic net start', flush=True)
     realization_set = acyclic_net_variants_new(behavior_net, bn_i, bn_f)
-    # print('acyclic net end', flush=True)
 
     # Computes the upper bound for conformance via bruteforce on the realization set
-    # print(len(realization_set), flush=True)
-    # print('bruteforce alignments start', flush=True)
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
-    # print('bruteforce alignments end', flush=True)
 
     return max(alignments, key=lambda x: x['cost'])
 
@@ -154,11 +148,162 @@ def alignment_lower_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
-    print('acyclic net start')
     realization_set = acyclic_net_variants_new(behavior_net, bn_i, bn_f)
-    print('acyclic net stop')
 
-    # Computes the upper bound for conformance via bruteforce on the realization set
+    # Computes the lower bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
     return min(alignments, key=lambda x: x['cost'])
+
+
+
+
+
+
+
+
+
+
+def exec_alignment_lower_bound_su_log_bruteforce(log, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower and upper bounds for conformance of a strongly uncertain log against a reference Petri net.
+
+    :param log: the strongly uncertain event log
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: a list of 2-tuples containing the alignment results for the upper and lower bounds for conformance of the traces in the log
+    """
+
+    realization_set_sizes_list = []
+    for trace in log:
+        behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+
+        # Obtains all the realizations of the trace by executing all possible variants from the behavior net
+        # print('IN', flush=True)
+        # from pm4py.visualization.petrinet import factory as pt_vis
+        # gviz = pt_vis.apply(behavior_net, behavior_net.initial_marking, behavior_net.final_marking)
+        # pt_vis.view(gviz)
+        realization_set = acyclic_net_variants_new(behavior_net, behavior_net.initial_marking, behavior_net.final_marking)
+        # print('OUT', flush=True)
+        realization_set_sizes_list.append(len(realization_set))
+
+        # Computes the lower bound for conformance via bruteforce on the realization set
+        for realization in realization_set:
+            apply(realization, petri_net, initial_marking, final_marking, parameters)
+
+    return realization_set_sizes_list
+
+
+def exec_alignment_lower_bound_su_log(log, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower and upper bounds for conformance of a strongly uncertain log against a reference Petri net.
+
+    :param log: the strongly uncertain event log
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: a list of 2-tuples containing the alignment results for the upper and lower bounds for conformance of the traces in the log
+    """
+
+    for trace in log:
+        behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+
+        apply_trace_net(petri_net, initial_marking, final_marking, behavior_net, behavior_net.initial_marking, behavior_net.final_marking, parameters)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def cost_bounds_su_log(log, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower and upper bounds for conformance of a strongly uncertain log against a reference Petri net.
+
+    :param log: the strongly uncertain event log
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: a list of 2-tuples containing the alignment results for the upper and lower bounds for conformance of the traces in the log
+    """
+
+    return [cost_bounds_su_trace(u_trace, petri_net, initial_marking, final_marking, parameters) for u_trace in log]
+
+
+def cost_bounds_su_trace(trace, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower and upper bounds for conformance of a strongly uncertain trace against a reference Petri net by aligning all possible realizations.
+
+    :param trace: the strongly uncertain trace
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: a 2-tuple containing the alignment results for the upper and lower bounds for conformance of the trace
+    """
+
+    # Obtains the behavior net of the trace
+    behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+
+    return cost_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters), cost_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters)
+
+
+def cost_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the upper bound for conformance of a strongly uncertain trace against a reference Petri net by aligning all possible realizations.
+
+    :param behavior_net: the behavior net of a strongly uncertain trace
+    :param bn_i: the initial marking of the behavior net
+    :param bn_f: the final marking of the behavior net
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: the alignment results for the upper bound for conformance of the trace
+    """
+
+    # Obtains all the realizations of the trace by executing all possible variants from the behavior net
+    realization_set = acyclic_net_variants_new(behavior_net, bn_i, bn_f)
+
+    # Computes the upper bound for conformance via bruteforce on the realization set
+    costs = []
+    for trace in realization_set:
+        hash_act_tuple = hash(tuple(event['concept:name'] for event in trace))
+        if hash_act_tuple in parameters['ALIGNMENTS_MEMO']:
+            costs.append(parameters['ALIGNMENTS_MEMO'][hash_act_tuple])
+        else:
+            cost = apply(trace, petri_net, initial_marking, final_marking, parameters)['cost']
+            costs.append(cost)
+            parameters['ALIGNMENTS_MEMO'][hash_act_tuple] = cost
+
+    return max(costs)
+
+
+def cost_lower_bound_su_trace(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
+    """
+    Returns the lower bound for conformance of a strongly uncertain trace against a reference Petri net by aligning using the product between the reference Petri net and the behavior net of the trace.
+
+    :param behavior_net: the behavior net of a strongly uncertain trace
+    :param bn_i: the initial marking of the behavior net
+    :param bn_f: the final marking of the behavior net
+    :param petri_net: the reference Petri net
+    :param initial_marking: the initial marking of the reference Petri net
+    :param final_marking: the final marking of the reference Petri net
+    :param parameters: the optional parameters for alignments
+    :return: the alignment results for the lower bound for conformance of the trace
+    """
+
+    return alignment_lower_bound_su_trace(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters)['cost']
+
