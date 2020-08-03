@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <page id="n0">
+      <place id="n5">
+        <name>
+          <text>n5</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="n10">
+        <name>
+          <text>n10</text>
+        </name>
+      </place>
+      <place id="n6">
+        <name>
+          <text>n6</text>
+        </name>
+      </place>
+      <place id="n7">
+        <name>
+          <text>n7</text>
+        </name>
+      </place>
+      <place id="n8">
+        <name>
+          <text>n8</text>
+        </name>
+      </place>
+      <place id="n9">
+        <name>
+          <text>n9</text>
+        </name>
+      </place>
+      <transition id="n2">
+        <name>
+          <text>tC</text>
+        </name>
+      </transition>
+      <transition id="n0">
+        <name>
+          <text>tA</text>
+        </name>
+      </transition>
+      <transition id="n3">
+        <name>
+          <text>tD</text>
+        </name>
+      </transition>
+      <transition id="n1">
+        <name>
+          <text>tB</text>
+        </name>
+      </transition>
+      <transition id="n4">
+        <name>
+          <text>tE</text>
+        </name>
+      </transition>
+      <arc id="-9223363289042398176" source="n9" target="n3"/>
+      <arc id="8747812377636" source="n3" target="n8"/>
+      <arc id="-9223363289042398169" source="n5" target="n0"/>
+      <arc id="8747812377643" source="n0" target="n9"/>
+      <arc id="-9223363289042398162" source="n1" target="n10"/>
+      <arc id="8747812377650" source="n10" target="n4"/>
+      <arc id="-9223363289042398155" source="n8" target="n2"/>
+      <arc id="8747812377657" source="n2" target="n7"/>
+      <arc id="-9223363289042398148" source="n4" target="n6"/>
+      <arc id="8747812377629" source="n7" target="n1"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="n6">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>

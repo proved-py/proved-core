@@ -1,0 +1,297 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <page id="n0">
+      <place id="n27">
+        <name>
+          <text>n27</text>
+        </name>
+      </place>
+      <place id="n45">
+        <name>
+          <text>n45</text>
+        </name>
+      </place>
+      <place id="n28">
+        <name>
+          <text>n28</text>
+        </name>
+      </place>
+      <place id="n29">
+        <name>
+          <text>n29</text>
+        </name>
+      </place>
+      <place id="n30">
+        <name>
+          <text>n30</text>
+        </name>
+      </place>
+      <place id="n31">
+        <name>
+          <text>n31</text>
+        </name>
+      </place>
+      <place id="n32">
+        <name>
+          <text>n32</text>
+        </name>
+      </place>
+      <place id="n33">
+        <name>
+          <text>n33</text>
+        </name>
+      </place>
+      <place id="n34">
+        <name>
+          <text>n34</text>
+        </name>
+      </place>
+      <place id="n35">
+        <name>
+          <text>n35</text>
+        </name>
+      </place>
+      <place id="n36">
+        <name>
+          <text>n36</text>
+        </name>
+      </place>
+      <place id="n37">
+        <name>
+          <text>n37</text>
+        </name>
+      </place>
+      <place id="n38">
+        <name>
+          <text>n38</text>
+        </name>
+      </place>
+      <place id="n39">
+        <name>
+          <text>n39</text>
+        </name>
+      </place>
+      <place id="n40">
+        <name>
+          <text>n40</text>
+        </name>
+      </place>
+      <place id="n41">
+        <name>
+          <text>n41</text>
+        </name>
+      </place>
+      <place id="n42">
+        <name>
+          <text>n42</text>
+        </name>
+      </place>
+      <place id="n43">
+        <name>
+          <text>n43</text>
+        </name>
+      </place>
+      <place id="n25">
+        <name>
+          <text>n25</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="n44">
+        <name>
+          <text>n44</text>
+        </name>
+      </place>
+      <place id="n26">
+        <name>
+          <text>n26</text>
+        </name>
+      </place>
+      <transition id="n12">
+        <name>
+          <text>t3</text>
+        </name>
+      </transition>
+      <transition id="n0">
+        <name>
+          <text>tA</text>
+        </name>
+      </transition>
+      <transition id="n24">
+        <name>
+          <text>tO</text>
+        </name>
+      </transition>
+      <transition id="n13">
+        <name>
+          <text>tJ</text>
+        </name>
+      </transition>
+      <transition id="n1">
+        <name>
+          <text>tB</text>
+        </name>
+      </transition>
+      <transition id="n14">
+        <name>
+          <text>t4</text>
+        </name>
+      </transition>
+      <transition id="n2">
+        <name>
+          <text>t0</text>
+        </name>
+      </transition>
+      <transition id="n15">
+        <name>
+          <text>t5</text>
+        </name>
+      </transition>
+      <transition id="n3">
+        <name>
+          <text>t1</text>
+        </name>
+      </transition>
+      <transition id="n16">
+        <name>
+          <text>tK</text>
+        </name>
+      </transition>
+      <transition id="n4">
+        <name>
+          <text>tC</text>
+        </name>
+      </transition>
+      <transition id="n17">
+        <name>
+          <text>t6</text>
+        </name>
+      </transition>
+      <transition id="n5">
+        <name>
+          <text>tD</text>
+        </name>
+      </transition>
+      <transition id="n18">
+        <name>
+          <text>t7</text>
+        </name>
+      </transition>
+      <transition id="n6">
+        <name>
+          <text>tE</text>
+        </name>
+      </transition>
+      <transition id="n19">
+        <name>
+          <text>tL</text>
+        </name>
+      </transition>
+      <transition id="n7">
+        <name>
+          <text>tF</text>
+        </name>
+      </transition>
+      <transition id="n20">
+        <name>
+          <text>tM</text>
+        </name>
+      </transition>
+      <transition id="n8">
+        <name>
+          <text>tG</text>
+        </name>
+      </transition>
+      <transition id="n21">
+        <name>
+          <text>tN</text>
+        </name>
+      </transition>
+      <transition id="n9">
+        <name>
+          <text>tH</text>
+        </name>
+      </transition>
+      <transition id="n22">
+        <name>
+          <text>t8</text>
+        </name>
+      </transition>
+      <transition id="n10">
+        <name>
+          <text>tI</text>
+        </name>
+      </transition>
+      <transition id="n23">
+        <name>
+          <text>t9</text>
+        </name>
+      </transition>
+      <transition id="n11">
+        <name>
+          <text>t2</text>
+        </name>
+      </transition>
+      <arc id="-9223363289042415998" source="n36" target="n15"/>
+      <arc id="8747812359814" source="n43" target="n6"/>
+      <arc id="-9223363289042415991" source="n17" target="n39"/>
+      <arc id="8747812359821" source="n32" target="n7"/>
+      <arc id="8747812359695" source="n4" target="n45"/>
+      <arc id="-9223363289042415984" source="n44" target="n21"/>
+      <arc id="-9223363289042416110" source="n24" target="n41"/>
+      <arc id="8747812359828" source="n27" target="n12"/>
+      <arc id="8747812359702" source="n19" target="n31"/>
+      <arc id="-9223363289042415977" source="n10" target="n34"/>
+      <arc id="-9223363289042416103" source="n25" target="n2"/>
+      <arc id="8747812359835" source="n14" target="n37"/>
+      <arc id="8747812359709" source="n25" target="n3"/>
+      <arc id="-9223363289042415970" source="n1" target="n29"/>
+      <arc id="-9223363289042416096" source="n9" target="n32"/>
+      <arc id="8747812359842" source="n12" target="n36"/>
+      <arc id="8747812359716" source="n35" target="n0"/>
+      <arc id="-9223363289042415963" source="n36" target="n14"/>
+      <arc id="-9223363289042416089" source="n5" target="n26"/>
+      <arc id="8747812359849" source="n23" target="n44"/>
+      <arc id="8747812359723" source="n31" target="n22"/>
+      <arc id="-9223363289042415956" source="n39" target="n9"/>
+      <arc id="-9223363289042416082" source="n20" target="n30"/>
+      <arc id="8747812359856" source="n11" target="n35"/>
+      <arc id="8747812359730" source="n3" target="n28"/>
+      <arc id="-9223363289042415949" source="n21" target="n42"/>
+      <arc id="-9223363289042416075" source="n13" target="n34"/>
+      <arc id="8747812359863" source="n30" target="n5"/>
+      <arc id="8747812359737" source="n7" target="n33"/>
+      <arc id="-9223363289042415942" source="n31" target="n23"/>
+      <arc id="-9223363289042416068" source="n22" target="n43"/>
+      <arc id="8747812359744" source="n15" target="n38"/>
+      <arc id="-9223363289042416061" source="n29" target="n4"/>
+      <arc id="8747812359751" source="n34" target="n17"/>
+      <arc id="-9223363289042416054" source="n40" target="n16"/>
+      <arc id="8747812359758" source="n37" target="n10"/>
+      <arc id="-9223363289042416047" source="n27" target="n11"/>
+      <arc id="8747812359765" source="n38" target="n13"/>
+      <arc id="-9223363289042416040" source="n33" target="n8"/>
+      <arc id="8747812359772" source="n16" target="n32"/>
+      <arc id="-9223363289042416033" source="n2" target="n27"/>
+      <arc id="8747812359779" source="n6" target="n42"/>
+      <arc id="-9223363289042416026" source="n34" target="n18"/>
+      <arc id="8747812359786" source="n18" target="n40"/>
+      <arc id="-9223363289042416019" source="n0" target="n34"/>
+      <arc id="8747812359793" source="n41" target="n19"/>
+      <arc id="-9223363289042416012" source="n28" target="n1"/>
+      <arc id="8747812359800" source="n42" target="n20"/>
+      <arc id="-9223363289042416005" source="n8" target="n26"/>
+      <arc id="8747812359807" source="n45" target="n24"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="n26">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>

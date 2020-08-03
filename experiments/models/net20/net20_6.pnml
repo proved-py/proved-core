@@ -1,0 +1,469 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <page id="n0">
+      <place id="n67">
+        <name>
+          <text>n67</text>
+        </name>
+      </place>
+      <place id="n49">
+        <name>
+          <text>n49</text>
+        </name>
+      </place>
+      <place id="n68">
+        <name>
+          <text>n68</text>
+        </name>
+      </place>
+      <place id="n50">
+        <name>
+          <text>n50</text>
+        </name>
+      </place>
+      <place id="n69">
+        <name>
+          <text>n69</text>
+        </name>
+      </place>
+      <place id="n51">
+        <name>
+          <text>n51</text>
+        </name>
+      </place>
+      <place id="n70">
+        <name>
+          <text>n70</text>
+        </name>
+      </place>
+      <place id="n52">
+        <name>
+          <text>n52</text>
+        </name>
+      </place>
+      <place id="n71">
+        <name>
+          <text>n71</text>
+        </name>
+      </place>
+      <place id="n53">
+        <name>
+          <text>n53</text>
+        </name>
+      </place>
+      <place id="n72">
+        <name>
+          <text>n72</text>
+        </name>
+      </place>
+      <place id="n54">
+        <name>
+          <text>n54</text>
+        </name>
+      </place>
+      <place id="n73">
+        <name>
+          <text>n73</text>
+        </name>
+      </place>
+      <place id="n55">
+        <name>
+          <text>n55</text>
+        </name>
+      </place>
+      <place id="n38">
+        <name>
+          <text>n38</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="n56">
+        <name>
+          <text>n56</text>
+        </name>
+      </place>
+      <place id="n39">
+        <name>
+          <text>n39</text>
+        </name>
+      </place>
+      <place id="n57">
+        <name>
+          <text>n57</text>
+        </name>
+      </place>
+      <place id="n40">
+        <name>
+          <text>n40</text>
+        </name>
+      </place>
+      <place id="n58">
+        <name>
+          <text>n58</text>
+        </name>
+      </place>
+      <place id="n41">
+        <name>
+          <text>n41</text>
+        </name>
+      </place>
+      <place id="n59">
+        <name>
+          <text>n59</text>
+        </name>
+      </place>
+      <place id="n42">
+        <name>
+          <text>n42</text>
+        </name>
+      </place>
+      <place id="n60">
+        <name>
+          <text>n60</text>
+        </name>
+      </place>
+      <place id="n43">
+        <name>
+          <text>n43</text>
+        </name>
+      </place>
+      <place id="n61">
+        <name>
+          <text>n61</text>
+        </name>
+      </place>
+      <place id="n44">
+        <name>
+          <text>n44</text>
+        </name>
+      </place>
+      <place id="n62">
+        <name>
+          <text>n62</text>
+        </name>
+      </place>
+      <place id="n45">
+        <name>
+          <text>n45</text>
+        </name>
+      </place>
+      <place id="n63">
+        <name>
+          <text>n63</text>
+        </name>
+      </place>
+      <place id="n46">
+        <name>
+          <text>n46</text>
+        </name>
+      </place>
+      <place id="n64">
+        <name>
+          <text>n64</text>
+        </name>
+      </place>
+      <place id="n47">
+        <name>
+          <text>n47</text>
+        </name>
+      </place>
+      <place id="n65">
+        <name>
+          <text>n65</text>
+        </name>
+      </place>
+      <place id="n48">
+        <name>
+          <text>n48</text>
+        </name>
+      </place>
+      <place id="n66">
+        <name>
+          <text>n66</text>
+        </name>
+      </place>
+      <transition id="n19">
+        <name>
+          <text>tL</text>
+        </name>
+      </transition>
+      <transition id="n7">
+        <name>
+          <text>tF</text>
+        </name>
+      </transition>
+      <transition id="n32">
+        <name>
+          <text>tS</text>
+        </name>
+      </transition>
+      <transition id="n20">
+        <name>
+          <text>tM</text>
+        </name>
+      </transition>
+      <transition id="n8">
+        <name>
+          <text>tG</text>
+        </name>
+      </transition>
+      <transition id="n34">
+        <name>
+          <text>t15_join</text>
+        </name>
+      </transition>
+      <transition id="n21">
+        <name>
+          <text>tN</text>
+        </name>
+      </transition>
+      <transition id="n9">
+        <name>
+          <text>tH</text>
+        </name>
+      </transition>
+      <transition id="n36">
+        <name>
+          <text>t16_split</text>
+        </name>
+      </transition>
+      <transition id="n22">
+        <name>
+          <text>t8</text>
+        </name>
+      </transition>
+      <transition id="n35">
+        <name>
+          <text>tT</text>
+        </name>
+      </transition>
+      <transition id="n10">
+        <name>
+          <text>tI</text>
+        </name>
+      </transition>
+      <transition id="n23">
+        <name>
+          <text>t9</text>
+        </name>
+      </transition>
+      <transition id="n11">
+        <name>
+          <text>t2</text>
+        </name>
+      </transition>
+      <transition id="n37">
+        <name>
+          <text>t17_join</text>
+        </name>
+      </transition>
+      <transition id="n12">
+        <name>
+          <text>t3</text>
+        </name>
+      </transition>
+      <transition id="n0">
+        <name>
+          <text>tA</text>
+        </name>
+      </transition>
+      <transition id="n24">
+        <name>
+          <text>tO</text>
+        </name>
+      </transition>
+      <transition id="n1">
+        <name>
+          <text>tB</text>
+        </name>
+      </transition>
+      <transition id="n25">
+        <name>
+          <text>tP</text>
+        </name>
+      </transition>
+      <transition id="n13">
+        <name>
+          <text>tJ</text>
+        </name>
+      </transition>
+      <transition id="n2">
+        <name>
+          <text>t0</text>
+        </name>
+      </transition>
+      <transition id="n26">
+        <name>
+          <text>t10</text>
+        </name>
+      </transition>
+      <transition id="n14">
+        <name>
+          <text>t4</text>
+        </name>
+      </transition>
+      <transition id="n3">
+        <name>
+          <text>t1</text>
+        </name>
+      </transition>
+      <transition id="n27">
+        <name>
+          <text>t11</text>
+        </name>
+      </transition>
+      <transition id="n15">
+        <name>
+          <text>t5</text>
+        </name>
+      </transition>
+      <transition id="n30">
+        <name>
+          <text>t12_split</text>
+        </name>
+      </transition>
+      <transition id="n4">
+        <name>
+          <text>tC</text>
+        </name>
+      </transition>
+      <transition id="n28">
+        <name>
+          <text>tQ</text>
+        </name>
+      </transition>
+      <transition id="n16">
+        <name>
+          <text>tK</text>
+        </name>
+      </transition>
+      <transition id="n17">
+        <name>
+          <text>t6</text>
+        </name>
+      </transition>
+      <transition id="n5">
+        <name>
+          <text>tD</text>
+        </name>
+      </transition>
+      <transition id="n29">
+        <name>
+          <text>tR</text>
+        </name>
+      </transition>
+      <transition id="n18">
+        <name>
+          <text>t7</text>
+        </name>
+      </transition>
+      <transition id="n6">
+        <name>
+          <text>tE</text>
+        </name>
+      </transition>
+      <transition id="n31">
+        <name>
+          <text>t13_join</text>
+        </name>
+      </transition>
+      <transition id="n33">
+        <name>
+          <text>t14_split</text>
+        </name>
+      </transition>
+      <arc id="-9223363289042419070" source="n68" target="n32"/>
+      <arc id="-9223363289042417916" source="n30" target="n62"/>
+      <arc id="8747812356742" source="n27" target="n60"/>
+      <arc id="8747812357896" source="n9" target="n45"/>
+      <arc id="-9223363289042419063" source="n71" target="n37"/>
+      <arc id="-9223363289042417909" source="n19" target="n44"/>
+      <arc id="8747812356749" source="n32" target="n69"/>
+      <arc id="8747812357903" source="n33" target="n68"/>
+      <arc id="-9223363289042419056" source="n53" target="n16"/>
+      <arc id="-9223363289042417902" source="n48" target="n0"/>
+      <arc id="8747812356756" source="n21" target="n55"/>
+      <arc id="8747812357910" source="n35" target="n73"/>
+      <arc id="-9223363289042419049" source="n46" target="n26"/>
+      <arc id="-9223363289042417895" source="n51" target="n13"/>
+      <arc id="8747812356763" source="n8" target="n39"/>
+      <arc id="8747812357917" source="n3" target="n41"/>
+      <arc id="-9223363289042419042" source="n18" target="n53"/>
+      <arc id="-9223363289042417888" source="n47" target="n18"/>
+      <arc id="8747812356770" source="n13" target="n61"/>
+      <arc id="8747812357924" source="n0" target="n47"/>
+      <arc id="-9223363289042419035" source="n60" target="n33"/>
+      <arc id="-9223363289042417881" source="n42" target="n4"/>
+      <arc id="8747812356777" source="n67" target="n34"/>
+      <arc id="8747812357931" source="n57" target="n21"/>
+      <arc id="-9223363289042419028" source="n55" target="n20"/>
+      <arc id="-9223363289042419154" source="n59" target="n8"/>
+      <arc id="-9223363289042417874" source="n49" target="n14"/>
+      <arc id="8747812356784" source="n73" target="n37"/>
+      <arc id="8747812356658" source="n29" target="n71"/>
+      <arc id="-9223363289042419021" source="n6" target="n55"/>
+      <arc id="8747812357938" source="n49" target="n15"/>
+      <arc id="-9223363289042419147" source="n58" target="n30"/>
+      <arc id="-9223363289042417867" source="n36" target="n72"/>
+      <arc id="8747812356791" source="n56" target="n6"/>
+      <arc id="8747812356665" source="n11" target="n48"/>
+      <arc id="-9223363289042419014" source="n43" target="n5"/>
+      <arc id="8747812357945" source="n40" target="n11"/>
+      <arc id="-9223363289042419140" source="n46" target="n27"/>
+      <arc id="-9223363289042417860" source="n38" target="n3"/>
+      <arc id="8747812356798" source="n54" target="n19"/>
+      <arc id="8747812356672" source="n5" target="n39"/>
+      <arc id="-9223363289042419007" source="n50" target="n10"/>
+      <arc id="8747812357952" source="n17" target="n52"/>
+      <arc id="-9223363289042419133" source="n25" target="n67"/>
+      <arc id="-9223363289042417853" source="n16" target="n45"/>
+      <arc id="8747812356805" source="n37" target="n65"/>
+      <arc id="8747812356679" source="n10" target="n47"/>
+      <arc id="-9223363289042419000" source="n20" target="n43"/>
+      <arc id="8747812357959" source="n24" target="n63"/>
+      <arc id="-9223363289042419126" source="n44" target="n23"/>
+      <arc id="-9223363289042417846" source="n2" target="n40"/>
+      <arc id="8747812356812" source="n15" target="n51"/>
+      <arc id="8747812356686" source="n66" target="n25"/>
+      <arc id="-9223363289042418993" source="n69" target="n34"/>
+      <arc id="8747812357966" source="n1" target="n42"/>
+      <arc id="-9223363289042419119" source="n63" target="n31"/>
+      <arc id="8747812356819" source="n34" target="n39"/>
+      <arc id="8747812356693" source="n44" target="n22"/>
+      <arc id="-9223363289042418986" source="n22" target="n56"/>
+      <arc id="-9223363289042419112" source="n30" target="n64"/>
+      <arc id="8747812356826" source="n65" target="n31"/>
+      <arc id="8747812356700" source="n4" target="n58"/>
+      <arc id="-9223363289042418979" source="n41" target="n1"/>
+      <arc id="-9223363289042419105" source="n12" target="n49"/>
+      <arc id="8747812356833" source="n38" target="n2"/>
+      <arc id="8747812356707" source="n52" target="n9"/>
+      <arc id="-9223363289042418972" source="n26" target="n59"/>
+      <arc id="-9223363289042419098" source="n47" target="n17"/>
+      <arc id="8747812356840" source="n61" target="n28"/>
+      <arc id="8747812356714" source="n62" target="n24"/>
+      <arc id="-9223363289042418965" source="n45" target="n7"/>
+      <arc id="-9223363289042419091" source="n72" target="n35"/>
+      <arc id="8747812356847" source="n23" target="n57"/>
+      <arc id="8747812356721" source="n40" target="n12"/>
+      <arc id="-9223363289042418958" source="n33" target="n66"/>
+      <arc id="-9223363289042419084" source="n64" target="n36"/>
+      <arc id="8747812356854" source="n14" target="n50"/>
+      <arc id="8747812356728" source="n36" target="n70"/>
+      <arc id="-9223363289042418951" source="n31" target="n54"/>
+      <arc id="-9223363289042419077" source="n28" target="n47"/>
+      <arc id="8747812356861" source="n7" target="n46"/>
+      <arc id="8747812356735" source="n70" target="n29"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="n39">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>

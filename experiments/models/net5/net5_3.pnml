@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pnml>
+  <net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+    <page id="n0">
+      <place id="n10">
+        <name>
+          <text>n10</text>
+        </name>
+      </place>
+      <place id="n15">
+        <name>
+          <text>n15</text>
+        </name>
+      </place>
+      <place id="n20">
+        <name>
+          <text>n20</text>
+        </name>
+      </place>
+      <place id="n11">
+        <name>
+          <text>n11</text>
+        </name>
+      </place>
+      <place id="n16">
+        <name>
+          <text>n16</text>
+        </name>
+      </place>
+      <place id="n12">
+        <name>
+          <text>n12</text>
+        </name>
+      </place>
+      <place id="n17">
+        <name>
+          <text>n17</text>
+        </name>
+      </place>
+      <place id="n13">
+        <name>
+          <text>n13</text>
+        </name>
+      </place>
+      <place id="n18">
+        <name>
+          <text>n18</text>
+        </name>
+      </place>
+      <place id="n9">
+        <name>
+          <text>n9</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="n14">
+        <name>
+          <text>n14</text>
+        </name>
+      </place>
+      <place id="n19">
+        <name>
+          <text>n19</text>
+        </name>
+      </place>
+      <transition id="n2">
+        <name>
+          <text>tC</text>
+        </name>
+      </transition>
+      <transition id="n3">
+        <name>
+          <text>t0_split</text>
+        </name>
+      </transition>
+      <transition id="n6">
+        <name>
+          <text>tE</text>
+        </name>
+      </transition>
+      <transition id="n0">
+        <name>
+          <text>tA</text>
+        </name>
+      </transition>
+      <transition id="n7">
+        <name>
+          <text>t2_split</text>
+        </name>
+      </transition>
+      <transition id="n4">
+        <name>
+          <text>t1_join</text>
+        </name>
+      </transition>
+      <transition id="n1">
+        <name>
+          <text>tB</text>
+        </name>
+      </transition>
+      <transition id="n8">
+        <name>
+          <text>t3_join</text>
+        </name>
+      </transition>
+      <transition id="n5">
+        <name>
+          <text>tD</text>
+        </name>
+      </transition>
+      <arc id="-9223363289042398972" source="n3" target="n14"/>
+      <arc id="8747812376840" source="n16" target="n7"/>
+      <arc id="-9223363289042398965" source="n20" target="n8"/>
+      <arc id="8747812375742" source="n14" target="n2"/>
+      <arc id="-9223363289042400063" source="n0" target="n13"/>
+      <arc id="8747812375749" source="n5" target="n18"/>
+      <arc id="-9223363289042400056" source="n3" target="n12"/>
+      <arc id="8747812375756" source="n19" target="n6"/>
+      <arc id="-9223363289042400049" source="n7" target="n17"/>
+      <arc id="8747812375763" source="n12" target="n0"/>
+      <arc id="-9223363289042400042" source="n9" target="n3"/>
+      <arc id="8747812375770" source="n18" target="n8"/>
+      <arc id="-9223363289042400035" source="n13" target="n4"/>
+      <arc id="8747812375777" source="n1" target="n10"/>
+      <arc id="-9223363289042400028" source="n2" target="n16"/>
+      <arc id="8747812375784" source="n6" target="n20"/>
+      <arc id="-9223363289042400021" source="n17" target="n5"/>
+      <arc id="8747812375791" source="n15" target="n4"/>
+      <arc id="-9223363289042400014" source="n8" target="n15"/>
+      <arc id="8747812375798" source="n11" target="n1"/>
+      <arc id="-9223363289042400007" source="n4" target="n11"/>
+      <arc id="8747812375805" source="n7" target="n19"/>
+    </page>
+    <finalmarkings>
+      <marking>
+        <place idref="n10">
+          <text>1</text>
+        </place>
+      </marking>
+    </finalmarkings>
+  </net>
+</pnml>
