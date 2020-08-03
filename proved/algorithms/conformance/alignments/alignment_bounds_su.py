@@ -89,8 +89,10 @@ def alignment_bounds_su_trace(trace, petri_net, initial_marking, final_marking, 
 
     # Obtains the behavior net of the trace
     behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+    align_lower_bound = alignment_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters)
+    align_upper_bound_real_size = alignment_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters)
 
-    return alignment_lower_bound_su_trace(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters), alignment_upper_bound_su_trace_bruteforce(behavior_net, behavior_net.initial_marking, behavior_net.final_marking, petri_net, initial_marking, final_marking, parameters)
+    return align_lower_bound, align_upper_bound_real_size[0], align_upper_bound_real_size[1]
 
 
 def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):
@@ -113,7 +115,7 @@ def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     # Computes the upper bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in realization_set]
 
-    return max(alignments, key=lambda x: x['cost'])
+    return max(alignments, key=lambda x: x['cost']), len(realization_set)
 
 
 def alignment_lower_bound_su_trace(behavior_net, bn_i, bn_f, petri_net, initial_marking, final_marking, parameters=None):

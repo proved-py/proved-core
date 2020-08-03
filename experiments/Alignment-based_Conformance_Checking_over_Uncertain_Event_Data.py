@@ -6,6 +6,7 @@ import csv
 import os
 import glob
 from collections import defaultdict
+import statistics
 
 from pm4py.algo.simulation.tree_generator import factory as treegen
 from pm4py.objects.process_tree import semantics
@@ -728,12 +729,17 @@ def experiments_average(results):
 def generate_data_series_qualitative(uncertainty_values, experiment_results):
     lower_bound_series = [0] * len(uncertainty_values)
     upper_bound_series = [0] * len(uncertainty_values)
+    realization_num_series = [0] * len(uncertainty_values)
     for one_model_experiment_results in experiment_results.values():
         for i, uncertainty_value_result in enumerate(one_model_experiment_results):
-            for trace_lower_bound, trace_upper_bound in uncertainty_value_result:
+            for trace_lower_bound, trace_upper_bound, realization_set_size in uncertainty_value_result:
                 lower_bound_series[i] += trace_lower_bound // 10000
                 upper_bound_series[i] += trace_upper_bound // 10000
-    return [series_value / len(experiment_results) for series_value in lower_bound_series], [series_value / len(experiment_results) for series_value in upper_bound_series]
+                realization_num_series[i] += realization_set_size
+            # TODO: double check the averaging, I am probably dividing one extra time (by length of one_model_experiment_results)
+            realization_num_series = [num / len(uncertainty_value_result) for num in realization_num_series]
+        realization_num_series = [num / len(one_model_experiment_results) for num in realization_num_series]
+    return [series_value / len(experiment_results) for series_value in lower_bound_series], [series_value / len(experiment_results) for series_value in upper_bound_series], [series_value / len(experiment_results) for series_value in realization_num_series]
 
 
 def multidict():
@@ -781,7 +787,7 @@ def qualitative_experiments():
     fig, plots = plt.subplots(len(deviation_types), len(uncertainty_types), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, deviation_type in enumerate(deviation_types):
         for j, uncertainty_type in enumerate(uncertainty_types):
-            lower_bound_series, upper_bound_series = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
+            lower_bound_series, upper_bound_series, _ = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
             plots[i][j].plot(uncertainty_values, lower_bound_series, c='b')
             plots[i][j].plot(uncertainty_values, upper_bound_series, c='r')
             # Labels with relative values
@@ -808,7 +814,7 @@ def qualitative_experiments():
     plt.savefig('plot')
 
 
-def generate_data_series_quantitative(net_sizes, experiment_results):
+def generate_data_series_quantitative_mean(net_sizes, experiment_results):
     bruteforce_time_series = [0] * len(net_sizes)
     improved_time_series = [0] * len(net_sizes)
     for i, net_size in enumerate(net_sizes):
@@ -818,12 +824,26 @@ def generate_data_series_quantitative(net_sizes, experiment_results):
     return [series_value / len(experiment_results[net_sizes[0]]) for series_value in bruteforce_time_series], [series_value / len(experiment_results[net_sizes[0]]) for series_value in improved_time_series]
 
 
+def generate_data_series_quantitative_median(net_sizes, experiment_results):
+    bruteforce_time_series = [0] * len(net_sizes)
+    improved_time_series = [0] * len(net_sizes)
+    for i, net_size in enumerate(net_sizes):
+        bruteforce_time_list, improved_time_list = tuple(zip(*experiment_results[net_size]))
+        bruteforce_time_series[i] = statistics.median(bruteforce_time_list)
+        improved_time_series[i] = statistics.median(improved_time_list)
+        # for one_net_run_time in experiment_results[net_size]:
+        #     bruteforce_time_series[i] += one_net_run_time[0]
+        #     improved_time_series[i] += one_net_run_time[1]
+    # return [series_value / len(experiment_results[net_sizes[0]]) for series_value in bruteforce_time_series], [series_value / len(experiment_results[net_sizes[0]]) for series_value in improved_time_series]
+    return bruteforce_time_series, improved_time_series
+
+
 def quantitative_experiments():
     # QUANTITATIVE EXPERIMENTS
-    ntraces = 1
-    uncertainty_value = .2
+    ntraces = 100
+    uncertainty_value = .1
     uncertainty_types = {'Activities': (uncertainty_value, 0, 0), 'Timestamps': (0, uncertainty_value, 0), 'Indeterminate events': (0, 0, uncertainty_value), 'All': (uncertainty_value, uncertainty_value, uncertainty_value)}
-    net_sizes = [5, 10, 15]
+    net_sizes = [5, 10, 15, 20, 25]
     # print(sorted(glob.glob(os.path.join('experiments', 'models', 'net' + '5', '*.pnml'))))
     # nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
     nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in net_sizes}
@@ -861,13 +881,13 @@ def quantitative_experiments():
 
     # Pickling results
     import pickle
-    with open('quantitative_results.pickle', 'wb') as f:
+    with open('serv_quantitative_results.pickle', 'wb') as f:
         pickle.dump((uncertainty_value, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
 
-    # Plotting
+    # Plotting averages
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
-        bruteforce_time_series, improved_time_series = generate_data_series_quantitative(net_sizes, quantitative_results[uncertainty_type])
+        bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
         plots[i].plot(net_sizes, bruteforce_time_series, c='b')
         plots[i].plot(net_sizes, improved_time_series, c='r')
         # Labels with relative values
@@ -882,7 +902,7 @@ def quantitative_experiments():
 
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
-            plots[i].set_ylabel('Time (seconds)')
+            plots[i].set_ylabel('Mean time (seconds)')
 
         plots[i].margins(y=.15)
 
@@ -890,7 +910,35 @@ def quantitative_experiments():
         diagram.label_outer()
 
     plt.show()
-    # plt.savefig('plot')
+    plt.savefig('plot_mean')
+
+    # Plotting medians
+    fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    for i, uncertainty_type in enumerate(uncertainty_types):
+        bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
+        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
+        plots[i].plot(net_sizes, improved_time_series, c='r')
+        # Labels with relative values
+        # for j, point in enumerate(lower_bound_series):
+        #     if j > 0:
+        #         plots[i].annotate(round(point / lower_bound_series[0] * 100, 2), xy=(uncertainty_values[j], lower_bound_series[j]), xytext=(-25, -15), textcoords='offset pixels', annotation_clip=False, size=10)
+        # for j, point in enumerate(upper_bound_series):
+        #     if j > 0:
+        #         plots[i].annotate(round(point / upper_bound_series[0] * 100, 2), xy=(uncertainty_values[j], upper_bound_series[j]), xytext=(-25, 5), textcoords='offset pixels', annotation_clip=False, size=10)
+
+        # plots[i][j].annotate(deviation_type + '-' + uncertainty_type + '_' + str(i) + '-' + str(j), xy=(0, lower_bound_series[0]), annotation_clip=False, size=12)
+
+        plots[i].set_xlabel(uncertainty_type)
+        if i == 0:
+            plots[i].set_ylabel('Median time (seconds)')
+
+        plots[i].margins(y=.15)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    plt.show()
+    plt.savefig('plot_median')
 
     # # Plotting
     # fig, plots = plt.subplots(len(qualitative_results[0]), len(qualitative_results), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
@@ -1039,7 +1087,7 @@ def replot_qualitative():
     fig, plots = plt.subplots(len(deviation_types), len(uncertainty_types), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, deviation_type in enumerate(deviation_types):
         for j, uncertainty_type in enumerate(uncertainty_types):
-            lower_bound_series, upper_bound_series = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
+            lower_bound_series, upper_bound_series, _ = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
             plots[i][j].plot(uncertainty_values, lower_bound_series, c='b')
             plots[i][j].plot(uncertainty_values, upper_bound_series, c='r')
             # Labels with relative values
