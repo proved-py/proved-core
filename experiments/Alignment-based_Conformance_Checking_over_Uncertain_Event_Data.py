@@ -844,17 +844,8 @@ def quantitative_experiments():
     uncertainty_value = .1
     uncertainty_types = {'Activities': (uncertainty_value, 0, 0), 'Timestamps': (0, uncertainty_value, 0), 'Indeterminate events': (0, 0, uncertainty_value), 'All': (uncertainty_value, uncertainty_value, uncertainty_value)}
     net_sizes = [5, 10, 15, 20, 25]
-    # print(sorted(glob.glob(os.path.join('experiments', 'models', 'net' + '5', '*.pnml'))))
-    # nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
-    nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in net_sizes}
-    # print(sorted(glob.glob(os.path.join('experiments', 'models', 'net5', '*.pnml')))[9])
-    # for net_size, nets in nets_map.items():
-    #     print('NET ' + str(net_size))
-    #     for net, im, fm in nets:
-    #         print(str(net))
-    #         print(str(im))
-    #         print(str(fm))
-
+    nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
+    # nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in net_sizes}
 
     # Nets is a dictionary where the key is an integer (the size of the net), and the value is a list of 3-uples with net, initial marking and final marking
 
@@ -866,11 +857,6 @@ def quantitative_experiments():
             quantitative_results[uncertainty_type][net_size] = []
             for net, im, fm in nets:
                 log = apply_playout(net, im, fm, no_traces=ntraces)
-                # from pm4py.visualization.petrinet import factory as pt_vis
-                # gviz = pt_vis.apply(net, im, fm)
-                # pt_vis.view(gviz)
-                # for trace in log:
-                #     print([event['concept:name'] for event in trace])
                 add_uncertainty(unc_act_value, unc_time_value, unc_indet_value, log)
                 a = process_time()
                 exec_alignment_lower_bound_su_log_bruteforce(log, net, im, fm)
@@ -890,16 +876,6 @@ def quantitative_experiments():
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
         plots[i].plot(net_sizes, bruteforce_time_series, c='b')
         plots[i].plot(net_sizes, improved_time_series, c='r')
-        # Labels with relative values
-        # for j, point in enumerate(lower_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / lower_bound_series[0] * 100, 2), xy=(uncertainty_values[j], lower_bound_series[j]), xytext=(-25, -15), textcoords='offset pixels', annotation_clip=False, size=10)
-        # for j, point in enumerate(upper_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / upper_bound_series[0] * 100, 2), xy=(uncertainty_values[j], upper_bound_series[j]), xytext=(-25, 5), textcoords='offset pixels', annotation_clip=False, size=10)
-
-        # plots[i][j].annotate(deviation_type + '-' + uncertainty_type + '_' + str(i) + '-' + str(j), xy=(0, lower_bound_series[0]), annotation_clip=False, size=12)
-
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Mean time (seconds)')
@@ -918,16 +894,6 @@ def quantitative_experiments():
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
         plots[i].plot(net_sizes, bruteforce_time_series, c='b')
         plots[i].plot(net_sizes, improved_time_series, c='r')
-        # Labels with relative values
-        # for j, point in enumerate(lower_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / lower_bound_series[0] * 100, 2), xy=(uncertainty_values[j], lower_bound_series[j]), xytext=(-25, -15), textcoords='offset pixels', annotation_clip=False, size=10)
-        # for j, point in enumerate(upper_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / upper_bound_series[0] * 100, 2), xy=(uncertainty_values[j], upper_bound_series[j]), xytext=(-25, 5), textcoords='offset pixels', annotation_clip=False, size=10)
-
-        # plots[i][j].annotate(deviation_type + '-' + uncertainty_type + '_' + str(i) + '-' + str(j), xy=(0, lower_bound_series[0]), annotation_clip=False, size=12)
-
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Median time (seconds)')
@@ -940,33 +906,43 @@ def quantitative_experiments():
     plt.show()
     plt.savefig('plot_median')
 
-    # # Plotting
-    # fig, plots = plt.subplots(len(qualitative_results[0]), len(qualitative_results), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
-    # # fig.suptitle('Qualitative experiments on synthetic data')
-    # for i in range(len(qualitative_results)):
-    #     for j in range(len(qualitative_results[i])):
-    #         plots[j][i].plot(uncertainty_values, qualitative_results[i][j][0], c='b')
-    #         plots[j][i].plot(uncertainty_values, qualitative_results[i][j][1], c='r')
-    #         # Labels with relative values
-    #         for k, point in enumerate(qualitative_results[i][j][0]):
-    #             if k > 0:
-    #                 plots[j][i].annotate(round(point / qualitative_results[i][j][0][0] * 100, 2), xy=(uncertainty_values[k], qualitative_results[i][j][0][k]), xytext=(-25, -15), textcoords='offset pixels', annotation_clip=False, size=10)
-    #         for k, point in enumerate(qualitative_results[i][j][1]):
-    #             if k > 0:
-    #                 plots[j][i].annotate(round(point / qualitative_results[i][j][1][0] * 100, 2), xy=(uncertainty_values[k], qualitative_results[i][j][1][k]), xytext=(-25, 5), textcoords='offset pixels', annotation_clip=False, size=10)
-    #
-    #         if i == len(qualitative_results) - 1:
-    #             plots[i][j].set_xlabel(uncertainty_labels[j])
-    #         if j == 0:
-    #             plots[i][j].set_ylabel(deviation_labels[i])
-    #
-    #         plots[i][j].margins(y=.15)
-    #
-    # for diagram in plots.flat:
-    #     diagram.label_outer()
-    #
-    # plt.show()
-    # plt.savefig('plot')
+    # Plotting averages (log)
+    fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    for i, uncertainty_type in enumerate(uncertainty_types):
+        bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
+        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
+        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].set_xlabel(uncertainty_type)
+        plots[i].set_yscale('log')
+        if i == 0:
+            plots[i].set_ylabel('Mean time (seconds)')
+
+        plots[i].margins(y=.15)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    plt.show()
+    plt.savefig('plot_mean_log')
+
+    # Plotting medians (log)
+    fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    for i, uncertainty_type in enumerate(uncertainty_types):
+        bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
+        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
+        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].set_xlabel(uncertainty_type)
+        plots[i].set_yscale('log')
+        if i == 0:
+            plots[i].set_ylabel('Median time (seconds)')
+
+        plots[i].margins(y=.15)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    plt.show()
+    plt.savefig('plot_median_log')
 
 
 # from pm4py.objects.petri.petrinet import Marking
