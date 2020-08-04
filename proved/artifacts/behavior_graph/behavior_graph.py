@@ -47,17 +47,22 @@ class BehaviorGraph(DiGraph):
         self.add_nodes_from(nodes_list)
 
         # Applies the sweeping algorithm to the sorted list
+        # TODO: there are still bugs in the case timestamps coincide!
         for i, timestamp1 in enumerate(timestamps_list):
             if timestamp1[2] != 'LEFT':
-                for timestamp2 in timestamps_list[i + 1:]:
+                for j, timestamp2 in enumerate(timestamps_list[i + 1:]):
                     if timestamp2[2] == 'LEFT':
                         edges_list.append((timestamp1[1], timestamp2[1]))
                     if timestamp2[2] == 'CERTAIN':
                         edges_list.append((timestamp1[1], timestamp2[1]))
                         break
+                        # if j + 1 < len(timestamps_list) and timestamp2[0] < timestamps_list[j + 1][0]:
+                        #     break
                     if timestamp2[2] == 'RIGHT':
                         if (timestamp1[1], timestamp2[1]) in edges_list:
                             break
+                            # if j + 1 < len(timestamps_list) and timestamp2[0] < timestamps_list[j + 1][0]:
+                            #     break
 
         # Adding the edges to the graph object
         self.add_edges_from(edges_list)

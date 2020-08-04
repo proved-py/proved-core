@@ -1,5 +1,6 @@
 from random import random, sample
 from copy import copy
+from datetime import timedelta
 
 import numpy as np
 from pm4py.objects.log.util.xes import DEFAULT_TIMESTAMP_KEY
@@ -25,7 +26,7 @@ def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFA
     if p > 0.0:
         if log_map is None:
             if log is None:
-                raise ValueError('Parameters log and log_map_swaps cannot both be None.')
+                raise ValueError('Parameters log and log_map cannot both be None.')
             else:
                 log_map = {}
                 i = 0
@@ -38,8 +39,10 @@ def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFA
         indices_to_alter = sample(frozenset(log_map), to_alter)
         for i in indices_to_alter:
             trace, j = log_map[i]
-            trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key]))
-            trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key]))
+            # trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key]))
+            # trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key]))
+            trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
+            trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
 
 
 def add_uncertain_timestamp_to_log_montecarlo(log, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY):
