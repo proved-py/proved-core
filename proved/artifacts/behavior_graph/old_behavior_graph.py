@@ -4,9 +4,9 @@ from pm4py.objects.log.util import xes
 import proved.xes_keys as xes_keys
 
 
-def create_timestamp_list(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     # TODO: test this
-    timestamps_list = []
+    nodes_list = []
     for i, event in enumerate(trace):
         if u_activity_key not in event:
             if u_missing_key not in event:
@@ -21,16 +21,16 @@ def create_timestamp_list(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_ke
 
         # Fill in the timestamps list
         if u_timestamp_min_key not in event:
-            timestamps_list.append((event[timestamp_key], new_node, 'C'))
+            nodes_list.append((event[timestamp_key], new_node, 'C'))
         else:
-            timestamps_list.append((event[u_timestamp_min_key], new_node, 'L'))
-            timestamps_list.append((event[u_timestamp_max_key], new_node, 'R'))
+            nodes_list.append((event[u_timestamp_min_key], new_node, 'L'))
+            nodes_list.append((event[u_timestamp_max_key], new_node, 'R'))
 
-    # Sort timestamps_list by first term of its elements
-    timestamps_list.sort()
+    # Sort nodes_list by first term of its elements
+    nodes_list.sort()
 
     # Returns a tuple of nodes and timestamp types sorted by timestamp
-    return tuple((node, timestamp_type) for _, node, timestamp_type in timestamps_list)
+    return tuple((node, timestamp_type) for _, node, timestamp_type in nodes_list)
 
 
 class BehaviorGraph(DiGraph):
@@ -44,7 +44,7 @@ class BehaviorGraph(DiGraph):
     def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         super().__init__(self)
 
-        node_tuples = create_timestamp_list(trace, activity_key, timestamp_key, u_timestamp_min_key, u_timestamp_max_key, u_missing_key, u_activity_key)
+        node_tuples = create_nodes_tuples(trace, activity_key, timestamp_key, u_timestamp_min_key, u_timestamp_max_key, u_missing_key, u_activity_key)
         edges_list = []
 
         # Adding the nodes to the graph object

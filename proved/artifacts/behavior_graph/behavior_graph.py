@@ -4,10 +4,10 @@ from pm4py.objects.log.util import xes
 import proved.xes_keys as xes_keys
 
 
-def create_timestamp_list(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
+def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
     # TODO: test this
     # Timestamp type: False is 'minimum', True is 'maximum'
-    timestamps_list = []
+    nodes_tuples = []
     for i, event in enumerate(trace):
         if u_activity_key not in event:
             if u_missing_key not in event:
@@ -22,17 +22,17 @@ def create_timestamp_list(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_ke
 
         # Fill in the timestamps list
         if u_timestamp_min_key not in event:
-            timestamps_list.append((event[timestamp_key], new_node, False))
-            timestamps_list.append((event[timestamp_key], new_node, True))
+            nodes_tuples.append((event[timestamp_key], new_node, False))
+            nodes_tuples.append((event[timestamp_key], new_node, True))
         else:
-            timestamps_list.append((event[u_timestamp_min_key], new_node, False))
-            timestamps_list.append((event[u_timestamp_max_key], new_node, True))
+            nodes_tuples.append((event[u_timestamp_min_key], new_node, False))
+            nodes_tuples.append((event[u_timestamp_max_key], new_node, True))
 
-    # Sort timestamps_list by first term of its elements
-    timestamps_list.sort()
+    # Sort nodes_tuples by first term of its elements
+    nodes_tuples.sort()
 
     # Returns a tuple of nodes and timestamp types sorted by timestamp
-    return tuple((node, timestamp_type) for _, node, timestamp_type in timestamps_list)
+    return tuple((node, timestamp_type) for _, node, timestamp_type in nodes_tuples)
 
 
 class BehaviorGraph(DiGraph):
@@ -46,7 +46,7 @@ class BehaviorGraph(DiGraph):
     def __init__(self, trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
         super().__init__(self)
 
-        node_tuples = create_timestamp_list(trace, activity_key, timestamp_key, u_timestamp_min_key, u_timestamp_max_key, u_missing_key, u_activity_key)
+        node_tuples = create_nodes_tuples(trace, activity_key, timestamp_key, u_timestamp_min_key, u_timestamp_max_key, u_missing_key, u_activity_key)
         edges_list = []
 
         # Adding the nodes to the graph object
