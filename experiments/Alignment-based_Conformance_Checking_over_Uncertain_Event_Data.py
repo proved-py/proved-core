@@ -1134,7 +1134,54 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    quantitative_experiments()
+    # quantitative_experiments()
+
+    ### TESTS OF UNCERTAINTY SIMULATION
+    import pprint
+    from proved.simulation.bewilderer.add_activities import add_uncertain_activities_to_log
+    from proved.simulation.bewilderer.add_timestamps import add_uncertain_timestamp_to_log
+    from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
+    from pm4py.visualization.petrinet import factory as pt_vis
+
+    net_file = glob.glob(os.path.join('experiments', 'models', 'net10', 'net10_1.pnml'))
+    net, im, fm = import_net(net_file[0])
+    trace = apply_playout(net, im, fm, no_traces=1)[0]
+
+    # TRACE (NO UNCERTAINTY)
+    print('TRACE (NO UNCERTAINTY)')
+    for event in trace:
+        pprint.pprint(event)
+    p_u = .5
+
+    # TRACE (UNCERTAINTY ON ACTIVITIES)
+    trace_u_act = deepcopy(trace)
+    add_uncertain_activities_to_log(p_u, [trace_u_act])
+    print('TRACE (UNCERTAINTY ON ACTIVITIES)')
+    for event in trace_u_act:
+        pprint.pprint(event)
+    behavior_net_act = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace_u_act))
+    gviz_act = pt_vis.apply(behavior_net_act, behavior_net_act.initial_marking, behavior_net_act.final_marking)
+    pt_vis.view(gviz_act)
+    # TRACE (UNCERTAINTY ON TIMESTAMPS)
+    trace_u_time = deepcopy(trace)
+    add_uncertain_timestamp_to_log(p_u, [trace_u_time])
+    print('TRACE (UNCERTAINTY ON TIMESTAMPS)')
+    for event in trace_u_time:
+        pprint.pprint(event)
+    behavior_net_time = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace_u_time))
+    gviz_time = pt_vis.apply(behavior_net_time, behavior_net_time.initial_marking, behavior_net_time.final_marking)
+    pt_vis.view(gviz_time)
+
+
+
+
+
+
+
+
+
+
+
     # replot()
 
 
