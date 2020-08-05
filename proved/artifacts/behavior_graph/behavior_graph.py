@@ -57,7 +57,7 @@ class BehaviorGraph(DiGraph):
         for i, node_tuple1 in enumerate(node_tuples):
             node1, type1 = node_tuple1
             if type1 is True:
-                for j, node_tuple2 in enumerate(node_tuples[i + 1:]):
+                for node_tuple2 in node_tuples[i + 1:]:
                     node2, type2 = node_tuple2
                     if type2 is False:
                         edges_list.append((node1, node2))
