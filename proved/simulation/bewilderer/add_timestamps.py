@@ -2,7 +2,6 @@ from random import random, sample
 from copy import copy
 from datetime import timedelta
 
-import numpy as np
 from pm4py.objects.log.util.xes import DEFAULT_TIMESTAMP_KEY
 
 from proved.xes_keys import DEFAULT_U_TIMESTAMP_MIN_KEY, DEFAULT_U_TIMESTAMP_MAX_KEY
@@ -39,10 +38,16 @@ def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFA
         indices_to_alter = sample(frozenset(log_map), to_alter)
         for i in indices_to_alter:
             trace, j = log_map[i]
-            # trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key]))
-            # trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key]))
-            trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
-            trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
+            # trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
+            # trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
+            # If the event is the first in the trace, we alter the timestamp to overlap the following event. If the event is the last in the trace, we alter the
+            # timestamp to overlap the previous. In any other case, we pick either one at random.
+            if j == 0 or (j != len(trace) - 1 and random() < .5):
+                trace[j][u_timestamp_min_key] = copy(trace[j][timestamp_key]) - timedelta(milliseconds=100)
+                trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
+            else:
+                trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
+                trace[j][u_timestamp_max_key] = copy(trace[j][timestamp_key]) + timedelta(milliseconds=100)
 
 
 def add_uncertain_timestamp_to_log_montecarlo(log, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY):
