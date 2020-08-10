@@ -6,7 +6,7 @@ from proved.artifacts.behavior_graph import behavior_graph
 class UncertainLog(EventLog):
 
     def __init__(self, log=None):
-        self.__variants = tuple()
+        self.__variants = dict()
         self.__behavior_graphs_map = dict()
         if log is not None:
             EventLog.__init__(self, log)
@@ -31,7 +31,7 @@ class UncertainLog(EventLog):
         if self.behavior_graphs_map is not {}:
             variant_list = [(len(traces_list), nodes_list) for nodes_list, (_, traces_list) in self.behavior_graphs_map.items()]
             variant_list.sort(reverse=True)
-            self.__variants = tuple((i, variant_length, nodes_tuple) for i, (variant_length, nodes_tuple) in enumerate(variant_list))
+            self.__variants = {i: (variant_length, nodes_tuple) for i, (variant_length, nodes_tuple) in enumerate(variant_list)}
 
     def get_behavior_graph(self, trace):
         return self.behavior_graphs_map[behavior_graph.create_nodes_tuples(trace)]
