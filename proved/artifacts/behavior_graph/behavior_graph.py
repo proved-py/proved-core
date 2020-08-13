@@ -36,7 +36,6 @@ def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=
 
 
 class BehaviorGraph(DiGraph):
-    # TODO: test this
     """
     Class representing a behavior graph, a directed acyclic graph showing the precedence relationship between uncertain events.
     For more information refer to:
