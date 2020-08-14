@@ -4,6 +4,7 @@ from time import process_time
 import datetime
 import csv
 import os
+import sys
 import glob
 from collections import defaultdict
 from datetime import datetime
@@ -15,6 +16,7 @@ from pm4py.objects.conversion.process_tree import factory as pt_conv_factory
 import pm4py.objects.log.util.xes as xes_key
 from pm4py.objects.log.util import sorting
 from pm4py.objects.log.log import Trace, Event
+from pm4py.objects.log.importer.xes import factory as xes_import_factory
 # from pm4py.objects.petri.importer import factory as pnml_importer
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -256,95 +258,223 @@ def create_log(numtraces, lentraces, p_u_time):
     for i in range(numtraces):
         t = Trace()
         for j in range(lentraces):
-            t.append(Event({'concept:name': 'a', 'time:timestamp': basetime + timedelta(seconds=j)}))
+            t.append(Event({'concept:name': 'a', 'time:timestamp': basetime + timedelta(hours=j)}))
         log.append(t)
 
-    if p_u_time:
-        timevariation = timedelta(milliseconds=1500)
-
-        for trace in log:
-            for event in trace:
-                if random.random() < p_u_time:
-                    event["u:time:timestamp_left"] = event['time:timestamp'] - timevariation
-                    event["u:time:timestamp_right"] = event['time:timestamp'] + timevariation
+    add_uncertain_timestamp_to_log(p_u_time, log)
+    # if p_u_time:
+    #     timevariation = timedelta(milliseconds=1500)
+    #
+    #     for trace in log:
+    #         for event in trace:
+    #             if random() < p_u_time:
+    #                 event["u:time:timestamp_left"] = event['time:timestamp'] - timevariation
+    #                 event["u:time:timestamp_right"] = event['time:timestamp'] + timevariation
     return log
 
 
 def generate_data_series(net_sizes, experiment_results):
-    bruteforce_time_series = [0] * len(net_sizes)
+    transitive_reduction_time_series = [0] * len(net_sizes)
     improved_time_series = [0] * len(net_sizes)
+    multiset_improved_time_series = [0] * len(net_sizes)
     for i, net_size in enumerate(net_sizes):
         for one_net_run_time in experiment_results[net_size]:
-            bruteforce_time_series[i] += one_net_run_time[0]
+            transitive_reduction_time_series[i] += one_net_run_time[0]
             improved_time_series[i] += one_net_run_time[1]
-    return [series_value / len(experiment_results[net_sizes[0]]) for series_value in bruteforce_time_series], [series_value / len(experiment_results[net_sizes[0]]) for series_value in improved_time_series]
+            multiset_improved_time_series += one_net_run_time[1]
+    return [series_value / len(experiment_results[net_sizes[0]]) for series_value in transitive_reduction_time_series], [series_value / len(experiment_results[net_sizes[0]]) for series_value in improved_time_series], [series_value / len(experiment_results[net_sizes[0]]) for series_value in multiset_improved_time_series]
 
 
-def conformance_checking_experiments():
-    # EXPERIMENTS WITH CONFORMANCE CHECKING
-    ntraces = 1
-    uncertainty_value = .2
-    uncertainty_types = {'Activities': (uncertainty_value, 0, 0), 'Timestamps': (0, uncertainty_value, 0), 'Indeterminate events': (0, 0, uncertainty_value), 'All': (uncertainty_value, uncertainty_value, uncertainty_value)}
-    net_sizes = [5, 10, 15]
-    # print(sorted(glob.glob(os.path.join('experiments', 'models', 'net' + '5', '*.pnml'))))
-    # nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
-    nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in net_sizes}
-    # print(sorted(glob.glob(os.path.join('experiments', 'models', 'net5', '*.pnml')))[9])
-    # for net_size, nets in nets_map.items():
-    #     print('NET ' + str(net_size))
-    #     for net, im, fm in nets:
-    #         print(str(net))
-    #         print(str(im))
-    #         print(str(fm))
+from proved.artifacts.behavior_graph import tr_behavior_graph, old_behavior_graph
+from proved.artifacts.uncertain_log import uncertain_log
+from proved.algorithms.conformance.alignments.alignment_bounds_su import alignment_lower_bound_su_trace
+
+### EXPERIMENT PARAMS
+# Common parameters
+TR_LEGEND_LABEL = 'TrRed'
+IMP_LEGEND_LABEL = 'Imp'
+MULT_IMP_LEGEND_LABEL = 'ImpMul'
+TR_PLOT_STYLE = '-b'
+IMP_PLOT_STYLE = '--r'
+MULT_IMP_PLOT_STYLE = '..g'
+BPI_2012_PATH = os.path.join('experiments', 'BPI_Challenge_2012.xes')
+HELPDESK_PATH = os.path.join('experiments', 'Help_Desk_event_log.xes')
+ROAD_TRAFFIC_PATH = os.path.join('experiments', 'Road_Traffic_Fine_Management_Process.xes')
+BPI_2012_LABEL = 'BPIC 2012'
+HELPDESK_LABEL = 'HelpDesk'
+ROAD_TRAFFIC_LABEL = 'RTFM'
+
+# Experiment 1: Computing time against trace length
+T1_N_TRACES = 100
+T1_TRACE_LENGTH = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
+T1_UNCERTAINTY = .4
+
+# Experiment 2: Computing time against uncertainty percentage
+T2_N_TRACES = 100
+T2_TRACE_LENGTH = 10
+T2_UNCERTAINTY = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
+
+# Experiment 3: Memory occupation against log size
+T3_N_TRACES = [100, 200, 300, 400, 500, 600, 700, 800]
+T3_TRACE_LENGTH = 10
+T3_UNCERTAINTY = .4
+
+# Experiment 4: Conformance checking computing time against model size
+T4_N_TRACES = 100
+T4_NET_SIZES = [5, 10, 15]
+T4_UNCERTAINTY = .1
+
+# Experiment 5: Computing time against uncertainty percentage (real life)
+T5_UNCERTAINTY = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
+
+# Experiment 6: Memory occupation against uncertainty percentage (real life)
+T6_UNCERTAINTY = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
 
 
-    # Nets is a dictionary where the key is an integer (the size of the net), and the value is a list of 3-uples with net, initial marking and final marking
+def trace_length_vs_time():
+    # Experiment 1: Computing time against trace length
+    transitive_reduction_times = []
+    improved_times = []
+    multiset_improved_times = []
+    for length in T1_TRACE_LENGTH:
+        log = create_log(T1_N_TRACES, length, T1_UNCERTAINTY)
+        a = time.process_time()
+        for trace in log:
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
+        transitive_reduction_times.append(time.process_time() - a)
+        a = time.process_time()
+        for trace in log:
+            bg = behavior_graph.BehaviorGraph(trace)
+        improved_times.append(time.process_time() - a)
+        a = process_time()
+        uncertain_log_object = uncertain_log.UncertainLog(log)
+        multiset_improved_times.append(process_time() - a)
 
-    quantitative_results = defaultdict(dict)
+    # Pickling results
+    import pickle
+    with open('exp1.pickle', 'wb') as f:
+        pickle.dump((T4_UNCERTAINTY, (transitive_reduction_times, improved_times, multiset_improved_times)), f, pickle.HIGHEST_PROTOCOL)
+
+    # Plotting
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.plot(T2_UNCERTAINTY, transitive_reduction_times, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, improved_times, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, multiset_improved_times, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    ax.legend(frameon=False)
+    plt.show()
+    plt.clf()
+
+
+def prob_uncertainty_vs_time():
+    # Experiment 2: Computing time against uncertainty percentage
+    transitive_reduction_times = []
+    improved_times = []
+    multiset_improved_times = []
+    for p_u_time in T2_UNCERTAINTY:
+        log = create_log(T2_N_TRACES, T2_TRACE_LENGTH, p_u_time)
+        a = process_time()
+        for trace in log:
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
+        transitive_reduction_times.append(process_time() - a)
+        a = process_time()
+        for trace in log:
+            bg = behavior_graph.BehaviorGraph(trace)
+        improved_times.append(process_time() - a)
+        a = process_time()
+        uncertain_log_object = uncertain_log.UncertainLog(log)
+        multiset_improved_times.append(process_time() - a)
+
+    # Pickling results
+    import pickle
+    with open('exp2.pickle', 'wb') as f:
+        pickle.dump((T4_UNCERTAINTY, (transitive_reduction_times, improved_times, multiset_improved_times)), f, pickle.HIGHEST_PROTOCOL)
+
+    # Plotting
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.plot(T2_UNCERTAINTY, transitive_reduction_times, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, improved_times, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, multiset_improved_times, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    ax.legend(frameon=False)
+    plt.show()
+    plt.clf()
+
+
+def log_size_vs_memory():
+    # Experiment 3: Memory occupation against log size
+    transitive_reduction_memory = []
+    improved_memory = []
+    multiset_improved_memory = []
+    for n_traces in T3_N_TRACES:
+        log = create_log(n_traces, T3_TRACE_LENGTH, T3_UNCERTAINTY)
+        transitive_reduction_memory.append(sys.getsizeof([tr_behavior_graph.TRBehaviorGraph(trace) for trace in log]))
+        improved_memory.append(sys.getsizeof([behavior_graph.BehaviorGraph(trace) for trace in log]))
+        multiset_improved_memory.append(sys.getsizeof(uncertain_log.UncertainLog(log)))
+
+    # Pickling results
+    import pickle
+    with open('exp3.pickle', 'wb') as f:
+        pickle.dump((T4_UNCERTAINTY, (transitive_reduction_memory, improved_memory, multiset_improved_memory)), f, pickle.HIGHEST_PROTOCOL)
+
+    # Plotting
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.plot(T2_UNCERTAINTY, transitive_reduction_memory, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, improved_memory, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    ax.plot(T2_UNCERTAINTY, multiset_improved_memory, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    ax.legend(frameon=False)
+    plt.show()
+    plt.clf()
+
+
+def model_size_vs_conformance_checking_time_experiment():
+    # Experiment 4: Conformance checking computing time against model size
+    uncertainty_types = {'Activities': (T4_UNCERTAINTY, 0, 0), 'Timestamps': (0, T4_UNCERTAINTY, 0), 'Indeterminate events': (0, 0, T4_UNCERTAINTY), 'All': (T4_UNCERTAINTY, T4_UNCERTAINTY, T4_UNCERTAINTY)}
+    nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in T4_NET_SIZES}
+
+    conformance_checking_results = defaultdict(dict)
 
     for uncertainty_type, uncertainty in uncertainty_types.items():
         unc_act_value, unc_time_value, unc_indet_value = uncertainty
         for net_size, nets in nets_map.items():
-            quantitative_results[uncertainty_type][net_size] = []
+            conformance_checking_results[uncertainty_type][net_size] = []
             for net, im, fm in nets:
-                log = apply_playout(net, im, fm, no_traces=ntraces)
-                # from pm4py.visualization.petrinet import factory as pt_vis
-                # gviz = pt_vis.apply(net, im, fm)
-                # pt_vis.view(gviz)
-                # for trace in log:
-                #     print([event['concept:name'] for event in trace])
+                log = apply_playout(net, im, fm, no_traces=T4_N_TRACES)
                 add_uncertainty(unc_act_value, unc_time_value, unc_indet_value, log)
                 a = process_time()
-                exec_alignment_lower_bound_su_log_bruteforce(log, net, im, fm)
+                for trace in log:
+                    bg = tr_behavior_graph.TRBehaviorGraph(trace)
+                    bn = behavior_net.BehaviorNet(bg)
+                    alignment_lower_bound_su_trace(bn, bn.initial_marking, bn.final_marking, net, im, fm)
                 b = process_time()
-                exec_alignment_lower_bound_su_log(log, net, im, fm)
+                for trace in log:
+                    bg = old_behavior_graph.BehaviorGraph(trace)
+                    bn = behavior_net.BehaviorNet(bg)
+                    alignment_lower_bound_su_trace(bn, bn.initial_marking, bn.final_marking, net, im, fm)
                 c = process_time()
-                quantitative_results[uncertainty_type][net_size].append((b - a, c - b))
+                uncertain_log_object = uncertain_log.UncertainLog(log)
+                for bg, _ in uncertain_log_object.behavior_graphs_map.values():
+                    bn = behavior_net.BehaviorNet(bg)
+                    alignment_lower_bound_su_trace(bn, bn.initial_marking, bn.final_marking, net, im, fm)
+                d = process_time()
+                conformance_checking_results[uncertainty_type][net_size].append((b - a, c - b, d - c))
 
     # Pickling results
     import pickle
-    with open('quantitative_results.pickle', 'wb') as f:
-        pickle.dump((uncertainty_value, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
+    with open('exp4.pickle', 'wb') as f:
+        pickle.dump((T4_UNCERTAINTY, conformance_checking_results), f, pickle.HIGHEST_PROTOCOL)
 
-    # Plotting
+    # Plotting averages
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
-        bruteforce_time_series, improved_time_series = generate_data_series(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
-        plots[i].plot(net_sizes, improved_time_series, c='r')
-        # Labels with relative values
-        # for j, point in enumerate(lower_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / lower_bound_series[0] * 100, 2), xy=(uncertainty_values[j], lower_bound_series[j]), xytext=(-25, -15), textcoords='offset pixels', annotation_clip=False, size=10)
-        # for j, point in enumerate(upper_bound_series):
-        #     if j > 0:
-        #         plots[i].annotate(round(point / upper_bound_series[0] * 100, 2), xy=(uncertainty_values[j], upper_bound_series[j]), xytext=(-25, 5), textcoords='offset pixels', annotation_clip=False, size=10)
-
-        # plots[i][j].annotate(deviation_type + '-' + uncertainty_type + '_' + str(i) + '-' + str(j), xy=(0, lower_bound_series[0]), annotation_clip=False, size=12)
-
+        transitive_reduction_time_series, improved_time_series, multiset_improved_time_series = generate_data_series(T4_NET_SIZES, conformance_checking_results[uncertainty_type])
+        plots[i].plot(T4_NET_SIZES, transitive_reduction_time_series, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+        plots[i].plot(T4_NET_SIZES, improved_time_series, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+        plots[i].plot(T4_NET_SIZES, multiset_improved_time_series, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
-            plots[i].set_ylabel('Time (seconds)')
+            plots[i].set_ylabel('Mean time (seconds)')
 
         plots[i].margins(y=.15)
 
@@ -352,3 +482,142 @@ def conformance_checking_experiments():
         diagram.label_outer()
 
     plt.show()
+    plt.savefig('plot_mean')
+
+
+def perc_uncertainty_vs_time_rl():
+    # Experiment 5: Computing time against uncertainty percentage (real life)
+    bpi_transitive_reduction_times = []
+    bpi_improved_times = []
+    bpi_multiset_improved_times = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(BPI_2012_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        a = time.process_time()
+        for trace in log:
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
+        bpi_transitive_reduction_times.append(time.process_time() - a)
+        a = time.process_time()
+        for trace in log:
+            bg = behavior_graph.BehaviorGraph(trace)
+        bpi_improved_times.append(time.process_time() - a)
+        uncertain_log_object = uncertain_log.UncertainLog(log)
+        bpi_multiset_improved_times.append(process_time() - a)
+
+    hd_transitive_reduction_times = []
+    hd_improved_times = []
+    hd_multiset_improved_times = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(HELPDESK_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        a = time.process_time()
+        for trace in log:
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
+        hd_transitive_reduction_times.append(time.process_time() - a)
+        a = time.process_time()
+        for trace in log:
+            bg = behavior_graph.BehaviorGraph(trace)
+        hd_improved_times.append(time.process_time() - a)
+        uncertain_log_object = uncertain_log.UncertainLog(log)
+        hd_multiset_improved_times.append(process_time() - a)
+
+    rtfm_transitive_reduction_times = []
+    rtfm_improved_times = []
+    rtfm_multiset_improved_times = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(ROAD_TRAFFIC_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        a = time.process_time()
+        for trace in log:
+            bg = tr_behavior_graph.TRBehaviorGraph(trace)
+        rtfm_transitive_reduction_times.append(time.process_time() - a)
+        a = time.process_time()
+        for trace in log:
+            bg = behavior_graph.BehaviorGraph(trace)
+        rtfm_improved_times.append(time.process_time() - a)
+        uncertain_log_object = uncertain_log.UncertainLog(log)
+        rtfm_multiset_improved_times.append(process_time() - a)
+
+    # Plotting
+    fig, plots = plt.subplots(ncols=3, sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    plots[0].set_ylabel('Mean time (seconds)')
+    plots[0].set_xlabel(BPI_2012_LABEL)
+    plots[1].set_xlabel(HELPDESK_LABEL)
+    plots[2].set_xlabel(ROAD_TRAFFIC_LABEL)
+    plots[0].margins(y=.15)
+    plots[0].plot(T4_NET_SIZES, bpi_transitive_reduction_times, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[0].plot(T4_NET_SIZES, bpi_improved_times, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[0].plot(T4_NET_SIZES, bpi_multiset_improved_times, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    plots[1].margins(y=.15)
+    plots[1].plot(T4_NET_SIZES, hd_transitive_reduction_times, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[1].plot(T4_NET_SIZES, hd_improved_times, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[1].plot(T4_NET_SIZES, hd_multiset_improved_times, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    plots[2].margins(y=.15)
+    plots[2].plot(T4_NET_SIZES, rtfm_transitive_reduction_times, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[2].plot(T4_NET_SIZES, rtfm_improved_times, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[2].plot(T4_NET_SIZES, rtfm_multiset_improved_times, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    plt.show()
+    plt.savefig('plot_mean')
+
+
+def perc_uncertainty_vs_memory_rl():
+    # Experiment 6: Memory occupation against uncertainty percentage (real life)
+    # Experiment 5: Computing time against uncertainty percentage (real life)
+    bpi_transitive_reduction_memory = []
+    bpi_improved_memory = []
+    bpi_multiset_improved_memory = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(BPI_2012_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        bpi_transitive_reduction_memory.append(sys.getsizeof([tr_behavior_graph.TRBehaviorGraph(trace) for trace in log]))
+        bpi_improved_memory.append(sys.getsizeof([behavior_graph.BehaviorGraph(trace) for trace in log]))
+        bpi_multiset_improved_memory.append(sys.getsizeof(uncertain_log.UncertainLog(log)))
+
+    hd_transitive_reduction_memory = []
+    hd_improved_memory = []
+    hd_multiset_improved_memory = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(HELPDESK_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        hd_transitive_reduction_memory.append(sys.getsizeof([tr_behavior_graph.TRBehaviorGraph(trace) for trace in log]))
+        hd_improved_memory.append(sys.getsizeof([behavior_graph.BehaviorGraph(trace) for trace in log]))
+        hd_multiset_improved_memory.append(sys.getsizeof(uncertain_log.UncertainLog(log)))
+
+    rtfm_transitive_reduction_memory = []
+    rtfm_improved_memory = []
+    rtfm_multiset_improved_memory = []
+    for p_u_time in T5_UNCERTAINTY:
+        log = xes_import_factory.apply(ROAD_TRAFFIC_PATH)
+        add_uncertain_timestamp_to_log(log, p_u_time)
+        rtfm_transitive_reduction_memory.append(sys.getsizeof([tr_behavior_graph.TRBehaviorGraph(trace) for trace in log]))
+        rtfm_improved_memory.append(sys.getsizeof([behavior_graph.BehaviorGraph(trace) for trace in log]))
+        rtfm_multiset_improved_memory.append(sys.getsizeof(uncertain_log.UncertainLog(log)))
+
+    # Plotting
+    fig, plots = plt.subplots(ncols=3, sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    plots[0].set_ylabel('Memory (bytes)')
+    plots[0].set_xlabel(BPI_2012_LABEL)
+    plots[1].set_xlabel(HELPDESK_LABEL)
+    plots[2].set_xlabel(ROAD_TRAFFIC_LABEL)
+    plots[0].margins(y=.15)
+    plots[0].plot(T4_NET_SIZES, bpi_transitive_reduction_memory, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[0].plot(T4_NET_SIZES, bpi_improved_memory, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[0].plot(T4_NET_SIZES, bpi_multiset_improved_memory, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    plots[1].margins(y=.15)
+    plots[1].plot(T4_NET_SIZES, hd_transitive_reduction_memory, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[1].plot(T4_NET_SIZES, hd_improved_memory, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[1].plot(T4_NET_SIZES, hd_multiset_improved_memory, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+    plots[2].margins(y=.15)
+    plots[2].plot(T4_NET_SIZES, rtfm_transitive_reduction_memory, c=TR_PLOT_STYLE, label=TR_LEGEND_LABEL)
+    plots[2].plot(T4_NET_SIZES, rtfm_improved_memory, c=IMP_PLOT_STYLE, label=IMP_LEGEND_LABEL)
+    plots[2].plot(T4_NET_SIZES, rtfm_multiset_improved_memory, c=MULT_IMP_PLOT_STYLE, label=MULT_IMP_LEGEND_LABEL)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    plt.show()
+    plt.savefig('plot_mean')
