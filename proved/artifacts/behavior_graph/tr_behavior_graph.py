@@ -49,14 +49,14 @@ class TRBehaviorGraph(DiGraph):
         for i, event in enumerate(trace):
             if u_activity_key not in event:
                 if u_missing not in event:
-                    new_node = (i, frozenset(event[activity_key]))
+                    new_node = (i, frozenset((event[activity_key],)))
                 else:
-                    new_node = (i, frozenset([event[activity_key], None]))
+                    new_node = (i, frozenset((event[activity_key], None)))
             else:
                 if u_missing not in event:
                     new_node = (i, frozenset(event[u_activity_key]['children']))
                 else:
-                    new_node = (i, frozenset(event[u_activity_key]['children'] + [None]))
+                    new_node = (i, frozenset(tuple(event[u_activity_key]['children']) + (None,)))
 
             nodes_list.append(new_node)
             event_node_map[i] = new_node
