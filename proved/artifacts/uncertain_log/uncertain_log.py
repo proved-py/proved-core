@@ -20,9 +20,7 @@ class UncertainLog(EventLog):
     def __get_behavior_graphs_map(self):
         return self.__behavior_graphs_map
 
-    # TODO: method that given an uncertain log creates the behavior graphs and a mapping between uncertain traces and behavior graphs
     def create_behavior_graphs(self):
-        # TODO: this still suffers from the bug of the behavior graph creation: timestamps must not coincide
         for trace in self:
             nodes_tuple = behavior_graph.create_nodes_tuples(trace)
             if nodes_tuple not in self.behavior_graphs_map:
@@ -38,3 +36,4 @@ class UncertainLog(EventLog):
 
     variants = property(__get_variants)
     behavior_graphs_map = property(__get_behavior_graphs_map)
+
