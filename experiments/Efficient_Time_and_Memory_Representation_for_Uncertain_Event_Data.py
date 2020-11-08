@@ -7,7 +7,7 @@ from datetime import timedelta
 from time import process_time
 
 import matplotlib.pyplot as plt
-from matplotlib import rc
+from matplotlib import rc, ticker
 rc('text', usetex=True)
 from pm4py.objects.log.importer.xes import factory as xes_import_factory
 from pm4py.objects.log.log import Trace, Event
@@ -131,6 +131,8 @@ def e1_log_size_vs_time():
     # Labels with relative values
     for k, point in enumerate(multiset_improved_times):
         ax.annotate(str(round(point / transitive_reduction_times[k] * 100, 2)) + '\%', xy=(T1_N_TRACES[k], multiset_improved_times[k]), xytext=(-10, 10), textcoords='offset pixels', annotation_clip=False, size=8)
+    ax.get_xaxis().set_major_formatter(
+        ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     ax.set_xlabel('Log size (number of traces)')
     ax.set_ylabel('Behavior graph building time (seconds)')
     ax.legend(frameon=False)
@@ -256,6 +258,8 @@ def e4_log_size_vs_memory():
             ax.annotate(str(round(point / transitive_reduction_memory[k] * 100, 2)) + '\%', xy=(T4_N_TRACES[k], multiset_improved_memory[k]), xytext=(-10, -5), textcoords='offset pixels', annotation_clip=False, size=8)
         else:
             ax.annotate(str(round(point / transitive_reduction_memory[k] * 100, 2)) + '\%', xy=(T4_N_TRACES[k], multiset_improved_memory[k]), xytext=(-10, -15), textcoords='offset pixels', annotation_clip=False, size=8)
+    ax.get_xaxis().set_major_formatter(
+        ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     ax.set_xlabel('Log size (number of traces)')
     ax.set_ylabel('Memory occupation (bytes)')
     ax.legend(frameon=False)
@@ -441,9 +445,9 @@ def e6_model_size_vs_conformance_checking_time():
 
 
 if __name__ == '__main__':
+    e1_log_size_vs_time()
     e2_trace_length_vs_time()
     e3_prob_uncertainty_vs_time()
     e4_log_size_vs_memory()
     e6_model_size_vs_conformance_checking_time()
     e5_perc_uncertainty_vs_time_rl()
-    e1_log_size_vs_time()
