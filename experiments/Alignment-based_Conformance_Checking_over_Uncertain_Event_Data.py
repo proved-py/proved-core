@@ -729,17 +729,12 @@ def experiments_average(results):
 def generate_data_series_qualitative(uncertainty_values, experiment_results):
     lower_bound_series = [0] * len(uncertainty_values)
     upper_bound_series = [0] * len(uncertainty_values)
-    realization_num_series = [0] * len(uncertainty_values)
     for one_model_experiment_results in experiment_results.values():
         for i, uncertainty_value_result in enumerate(one_model_experiment_results):
-            for trace_lower_bound, trace_upper_bound, realization_set_size in uncertainty_value_result:
+            for trace_lower_bound, trace_upper_bound in uncertainty_value_result:
                 lower_bound_series[i] += trace_lower_bound // 10000
                 upper_bound_series[i] += trace_upper_bound // 10000
-                realization_num_series[i] += realization_set_size
-            # TODO: double check the averaging, I am probably dividing one extra time (by length of one_model_experiment_results)
-            realization_num_series = [num / len(uncertainty_value_result) for num in realization_num_series]
-        realization_num_series = [num / len(one_model_experiment_results) for num in realization_num_series]
-    return [series_value / len(experiment_results) for series_value in lower_bound_series], [series_value / len(experiment_results) for series_value in upper_bound_series], [series_value / len(experiment_results) for series_value in realization_num_series]
+    return [series_value / len(experiment_results) for series_value in lower_bound_series], [series_value / len(experiment_results) for series_value in upper_bound_series]
 
 
 def multidict():
@@ -748,48 +743,53 @@ def multidict():
 
 def qualitative_experiments():
     # QUALITATIVE EXPERIMENTS
-    ntraces = 1
-    uncertainty_values = (0, .05, .1, .15, .2)
+    # ntraces = 100
+    uncertainty_values = (0, .04, .08, .12, .16)
+    # uncertainty_values = (0, .03, .06, .09, .12)
     zeroes = tuple([0] * len(uncertainty_values))
     uncertainty_types = {'Activities': (uncertainty_values, zeroes, zeroes), 'Timestamps': (zeroes, uncertainty_values, zeroes), 'Indeterminate events': (zeroes, zeroes, uncertainty_values), 'All': (uncertainty_values, uncertainty_values, uncertainty_values)}
     deviation_types = {'Activity labels': (.3, 0, 0), 'Swaps': (0, .3, 0), 'Extra events': (0, 0, .3), 'All': (.3, .3, .3)}
-    net_size = 10
-    nets_files = sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))
-    model_data = [import_net(net_file) for net_file in nets_files]
+    # net_size = 10
+    # nets_files = sorted(glob.glob(os.path.join('models', 'net' + str(net_size), '*.pnml')))
+    # model_data = [import_net(net_file) for net_file in nets_files]
+    #
+    # qualitative_results = defaultdict(multidict)
+    # # realizations_results = defaultdict(multidict)
+    #
+    # for i, this_model_data in enumerate(model_data):
+    #     net, im, fm = this_model_data
+    #     log = apply_playout(net, im, fm, no_traces=ntraces)
+    #     ALIGNMENTS_MEMO = {}
+    #     for deviation_type, deviations in deviation_types.items():
+    #         dev_a, dev_s, dev_d = deviations
+    #         # Adding deviations
+    #         label_set, _, dev_log = add_deviations(deepcopy(log), dev_a, dev_s, dev_d)
+    #         for uncertainty_type, uncertainties in uncertainty_types.items():
+    #             unc_act_values, unc_time_values, unc_indet_values = uncertainties
+    #             qualitative_results[deviation_type][uncertainty_type][this_model_data] = []
+    #             for j in range(len(unc_act_values)):
+    #                 # Adding uncertainty
+    #                 uncertain_log = deepcopy(dev_log)
+    #                 add_uncertainty(unc_act_values[j], unc_time_values[j], unc_indet_values[j], uncertain_log, label_set=label_set)
+    #                 print('Experiment: ' + str(i) + ', deviation = ' + str(dev_a) + ' ' + str(dev_s) + ' ' + str(dev_d) + ', uncertainty = ' + str(unc_act_values[j]) + ' ' + str(unc_time_values[j]) + ' ' + str(unc_indet_values[j]))
+    #                 qualitative_results[deviation_type][uncertainty_type][this_model_data].append(cost_bounds_su_log(uncertain_log, net, im, fm, parameters={'ALIGNMENTS_MEMO': ALIGNMENTS_MEMO}))
 
-    qualitative_results = defaultdict(multidict)
-    # realizations_results = defaultdict(multidict)
-
-    for i, this_model_data in enumerate(model_data):
-        net, im, fm = this_model_data
-        log = apply_playout(net, im, fm, no_traces=ntraces)
-        ALIGNMENTS_MEMO = {}
-        for deviation_type, deviations in deviation_types.items():
-            dev_a, dev_s, dev_d = deviations
-            # Adding deviations
-            label_set, _, dev_log = add_deviations(deepcopy(log), dev_a, dev_s, dev_d)
-            for uncertainty_type, uncertainties in uncertainty_types.items():
-                unc_act_values, unc_time_values, unc_indet_values = uncertainties
-                qualitative_results[deviation_type][uncertainty_type][this_model_data] = []
-                for j in range(len(unc_act_values)):
-                    # Adding uncertainty
-                    uncertain_log = deepcopy(dev_log)
-                    add_uncertainty(unc_act_values[j], unc_time_values[j], unc_indet_values[j], uncertain_log, label_set=label_set)
-                    print('Experiment: ' + str(i) + ', deviation = ' + str(dev_a) + ' ' + str(dev_s) + ' ' + str(dev_d) + ', uncertainty = ' + str(unc_act_values[j]) + ' ' + str(unc_time_values[j]) + ' ' + str(unc_indet_values[j]))
-                    qualitative_results[deviation_type][uncertainty_type][this_model_data].append(cost_bounds_su_log(uncertain_log, net, im, fm, parameters={'ALIGNMENTS_MEMO': ALIGNMENTS_MEMO}))
-
-    # Pickling results
+    # # Pickling results
+    # import pickle
+    # with open('serv_qualitative_results_new.pickle', 'wb') as f:
+    #     pickle.dump((uncertainty_values, qualitative_results), f, pickle.HIGHEST_PROTOCOL)
     import pickle
-    with open('qualitative_results_new.pickle', 'wb') as f:
-        pickle.dump((uncertainty_values, qualitative_results), f, pickle.HIGHEST_PROTOCOL)
+    with open(os.path.join('experiments', 'serv_qualitative_results_new.pickle'), 'rb') as f:
+        uncertainty_values, qualitative_results = pickle.load(f)
 
     # Plotting
     fig, plots = plt.subplots(len(deviation_types), len(uncertainty_types), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, deviation_type in enumerate(deviation_types):
         for j, uncertainty_type in enumerate(uncertainty_types):
-            lower_bound_series, upper_bound_series, _ = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
-            plots[i][j].plot(uncertainty_values, lower_bound_series, c='b')
-            plots[i][j].plot(uncertainty_values, upper_bound_series, c='r')
+            lower_bound_series, upper_bound_series = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
+            plots[i][j].plot(uncertainty_values, [lower_bound_series[0]] * len(lower_bound_series), '#b0b0b0')
+            plots[i][j].plot(uncertainty_values, lower_bound_series, ':b')
+            plots[i][j].plot(uncertainty_values, upper_bound_series, '--r')
             # Labels with relative values
             for k, point in enumerate(lower_bound_series):
                 if k > 0:
@@ -810,8 +810,11 @@ def qualitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
+    fig.text(0.51, 0.03, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+    fig.text(0.075, 0.5, 'Conformance cost', va='center', rotation='vertical', fontsize=14)
+
     plt.show()
-    plt.savefig('plot')
+    plt.savefig('plot_qual')
 
 
 def generate_data_series_quantitative_mean(net_sizes, experiment_results):
@@ -841,41 +844,50 @@ def generate_data_series_quantitative_median(net_sizes, experiment_results):
 def quantitative_experiments():
     # QUANTITATIVE EXPERIMENTS
     ntraces = 100
-    uncertainty_value = .1
+    uncertainty_value = .05
     uncertainty_types = {'Activities': (uncertainty_value, 0, 0), 'Timestamps': (0, uncertainty_value, 0), 'Indeterminate events': (0, 0, uncertainty_value), 'All': (uncertainty_value, uncertainty_value, uncertainty_value)}
-    net_sizes = [5, 10, 15, 20, 25]
-    nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
+    # net_sizes = [5, 10, 15, 20, 25]
+    net_sizes = [5, 10, 15, 20]
+    nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
     # nets_map = {net_size: [import_net(net_file) for net_file in [sorted(glob.glob(os.path.join('experiments', 'models', 'net' + str(net_size), '*.pnml')))[9]]] for net_size in net_sizes}
 
     # Nets is a dictionary where the key is an integer (the size of the net), and the value is a list of 3-uples with net, initial marking and final marking
 
-    quantitative_results = defaultdict(dict)
-
-    for uncertainty_type, uncertainty in uncertainty_types.items():
-        unc_act_value, unc_time_value, unc_indet_value = uncertainty
-        for net_size, nets in nets_map.items():
-            quantitative_results[uncertainty_type][net_size] = []
-            for net, im, fm in nets:
-                log = apply_playout(net, im, fm, no_traces=ntraces)
-                add_uncertainty(unc_act_value, unc_time_value, unc_indet_value, log)
-                a = process_time()
-                exec_alignment_lower_bound_su_log_bruteforce(log, net, im, fm)
-                b = process_time()
-                exec_alignment_lower_bound_su_log(log, net, im, fm)
-                c = process_time()
-                quantitative_results[uncertainty_type][net_size].append((b - a, c - b))
-
-    # Pickling results
+    # quantitative_results = defaultdict(dict)
+    #
+    # for uncertainty_type, uncertainty in uncertainty_types.items():
+    #     unc_act_value, unc_time_value, unc_indet_value = uncertainty
+    #     print('Testing uncertainty values: ' + str(unc_act_value) + ' ' + str(unc_time_value) + ' ' + str(unc_indet_value))
+    #     for net_size, nets in nets_map.items():
+    #         print('Testing net size: ' + str(net_size))
+    #         quantitative_results[uncertainty_type][net_size] = []
+    #         i = 0
+    #         for net, im, fm in nets:
+    #             print('Testing net: ' + str(i))
+    #             log = apply_playout(net, im, fm, no_traces=ntraces)
+    #             add_uncertainty(unc_act_value, unc_time_value, unc_indet_value, log)
+    #             a = process_time()
+    #             exec_alignment_lower_bound_su_log_bruteforce(log, net, im, fm)
+    #             b = process_time()
+    #             exec_alignment_lower_bound_su_log(log, net, im, fm)
+    #             c = process_time()
+    #             quantitative_results[uncertainty_type][net_size].append((b - a, c - b))
+    #             i += 1
+    #
+    # # Pickling results
+    # import pickle
+    # with open('serv_quantitative_results.pickle', 'wb') as f:
+    #     pickle.dump((uncertainty_value, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
     import pickle
-    with open('serv_quantitative_results.pickle', 'wb') as f:
-        pickle.dump((uncertainty_value, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
+    with open(os.path.join('experiments', '__serv_quantitative_results.pickle'), 'rb') as f:
+        uncertainty_values, quantitative_results = pickle.load(f)
 
     # Plotting averages
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
-        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
+        plots[i].plot(net_sizes, improved_time_series, '--r')
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Mean time (seconds)')
@@ -884,16 +896,19 @@ def quantitative_experiments():
 
     for diagram in plots.flat:
         diagram.label_outer()
+
+    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
 
     plt.show()
     plt.savefig('plot_mean')
 
+    fig.clf()
     # Plotting medians
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
-        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
+        plots[i].plot(net_sizes, improved_time_series, '--r')
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Median time (seconds)')
@@ -903,15 +918,18 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
+    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+
     plt.show()
     plt.savefig('plot_median')
 
+    fig.clf()
     # Plotting averages (log)
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
-        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
+        plots[i].plot(net_sizes, improved_time_series, '--r')
         plots[i].set_xlabel(uncertainty_type)
         plots[i].set_yscale('log')
         if i == 0:
@@ -922,15 +940,18 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
+    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+
     plt.show()
     plt.savefig('plot_mean_log')
 
+    fig.clf()
     # Plotting medians (log)
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, c='b')
-        plots[i].plot(net_sizes, improved_time_series, c='r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
+        plots[i].plot(net_sizes, improved_time_series, '--r')
         plots[i].set_xlabel(uncertainty_type)
         plots[i].set_yscale('log')
         if i == 0:
@@ -941,8 +962,12 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
+    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+
     plt.show()
     plt.savefig('plot_median_log')
+
+    fig.clf()
 
 
 # from pm4py.objects.petri.petrinet import Marking
@@ -1053,7 +1078,7 @@ def quantitative_experiments():
 def replot_qualitative():
     # Loading results
     import pickle
-    with open('qualitative_results_new.pickle', 'rb') as f:
+    with open('serv_qualitative_results_new.pickle', 'rb') as f:
         uncertainty_values, qualitative_results = pickle.load(f)
 
     deviation_types = tuple(qualitative_results)
@@ -1063,7 +1088,7 @@ def replot_qualitative():
     fig, plots = plt.subplots(len(deviation_types), len(uncertainty_types), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, deviation_type in enumerate(deviation_types):
         for j, uncertainty_type in enumerate(uncertainty_types):
-            lower_bound_series, upper_bound_series, _ = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
+            lower_bound_series, upper_bound_series = generate_data_series_qualitative(uncertainty_values, qualitative_results[deviation_type][uncertainty_type])
             plots[i][j].plot(uncertainty_values, lower_bound_series, c='b')
             plots[i][j].plot(uncertainty_values, upper_bound_series, c='r')
             # Labels with relative values
@@ -1134,55 +1159,10 @@ if __name__ == '__main__':
     #
     # plt.show()
 
+    qualitative_experiments()
     # quantitative_experiments()
 
-    ### TESTS OF UNCERTAINTY SIMULATION
-    import pprint
-    from proved.simulation.bewilderer.add_activities import add_uncertain_activities_to_log
-    from proved.simulation.bewilderer.add_timestamps import add_uncertain_timestamp_to_log
-    from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
-    from pm4py.visualization.petrinet import factory as pt_vis
-
-    net_file = glob.glob(os.path.join('experiments', 'models', 'net10', 'net10_1.pnml'))
-    net, im, fm = import_net(net_file[0])
-    trace = apply_playout(net, im, fm, no_traces=1)[0]
-
-    # TRACE (NO UNCERTAINTY)
-    print('TRACE (NO UNCERTAINTY)')
-    for event in trace:
-        pprint.pprint(event)
-    p_u = .5
-
-    # TRACE (UNCERTAINTY ON ACTIVITIES)
-    trace_u_act = deepcopy(trace)
-    add_uncertain_activities_to_log(p_u, [trace_u_act])
-    print('TRACE (UNCERTAINTY ON ACTIVITIES)')
-    for event in trace_u_act:
-        pprint.pprint(event)
-    behavior_net_act = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace_u_act))
-    gviz_act = pt_vis.apply(behavior_net_act, behavior_net_act.initial_marking, behavior_net_act.final_marking)
-    pt_vis.view(gviz_act)
-    # TRACE (UNCERTAINTY ON TIMESTAMPS)
-    trace_u_time = deepcopy(trace)
-    add_uncertain_timestamp_to_log(p_u, [trace_u_time])
-    print('TRACE (UNCERTAINTY ON TIMESTAMPS)')
-    for event in trace_u_time:
-        pprint.pprint(event)
-    behavior_net_time = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace_u_time))
-    gviz_time = pt_vis.apply(behavior_net_time, behavior_net_time.initial_marking, behavior_net_time.final_marking)
-    pt_vis.view(gviz_time)
-
-
-
-
-
-
-
-
-
-
-
-    # replot()
+    # replot_qualitative()
 
 
 
