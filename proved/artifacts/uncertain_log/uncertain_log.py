@@ -36,4 +36,3 @@ class UncertainLog(EventLog):
 
     variants = property(__get_variants)
     behavior_graphs_map = property(__get_behavior_graphs_map)
-
