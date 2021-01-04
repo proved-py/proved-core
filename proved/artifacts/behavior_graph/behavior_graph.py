@@ -5,7 +5,6 @@ import proved.xes_keys as xes_keys
 
 
 def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=xes.DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=xes_keys.DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=xes_keys.DEFAULT_U_TIMESTAMP_MAX_KEY, u_missing_key=xes_keys.DEFAULT_U_MISSING_KEY, u_activity_key=xes_keys.DEFAULT_U_NAME_KEY):
-    # TODO: test this
     # Timestamp type: False is 'minimum', True is 'maximum'
     nodes_tuples = []
     for i, event in enumerate(trace):
