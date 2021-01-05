@@ -9,7 +9,15 @@ def behavior_graph_graphviz(behavior_graph, name='bg', format='png', filename='b
 
     :param behavior_graph: A behavior graph
     :type behavior_graph:
-    :return: The Graphviz object of the behavior graph in input.
+    :param name: The name of the Graphviz object
+    :type name:
+    :param format: The format of the graphical object
+    :type format:
+    :param filename: The name of the filename for export from Graphviz
+    :type filename:
+    :param rankdir: The direction in which to draw the graph
+    :type rankdir:
+    :return: The Graphviz object of the behavior graph in input
     :rtype:
     """
 
