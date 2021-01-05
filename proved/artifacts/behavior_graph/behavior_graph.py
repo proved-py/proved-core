@@ -1,3 +1,5 @@
+import operator
+
 from networkx import DiGraph
 from pm4py.objects.log.util import xes
 
@@ -27,8 +29,8 @@ def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=
             nodes_tuples.append((event[u_timestamp_min_key], new_node, False))
             nodes_tuples.append((event[u_timestamp_max_key], new_node, True))
 
-    # Sort nodes_tuples by first term of its elements
-    nodes_tuples.sort()
+    # Sort nodes_tuples by first term of its elements and by type of timestamp
+    nodes_tuples.sort(key=operator.itemgetter(0, 2))
 
     # Returns a tuple of nodes and timestamp types sorted by timestamp
     return tuple((node, timestamp_type) for _, node, timestamp_type in nodes_tuples)
@@ -51,7 +53,6 @@ class BehaviorGraph(DiGraph):
         self.add_nodes_from([node for node, _ in node_tuples])
 
         # Applies the sweeping algorithm to the sorted list
-        # TODO: there are still bugs in the case timestamps coincide!
         for i, node_tuple1 in enumerate(node_tuples):
             node1, type1 = node_tuple1
             if type1 is True:
