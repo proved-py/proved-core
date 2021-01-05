@@ -1,4 +1,3 @@
-# from pm4py.objects.petri.utils import acyclic_net_variants
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply
 from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply_trace_net
 
