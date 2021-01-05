@@ -3,7 +3,7 @@ from pm4py.objects import petri
 
 class BehaviorNet(petri.petrinet.PetriNet):
     """
-    Class that represetn a behavior net, a sound workflow Petri net that can replay all realizations of an uncertain trace.
+    Class that represents a behavior net, a sound workflow Petri net that can replay all realizations of an uncertain trace.
     For more information refer to:
         Pegoraro, Marco, and Wil MP van der Aalst. "Mining uncertain event data in process mining." 2019 International Conference on Process Mining (ICPM). IEEE, 2019.
     """
