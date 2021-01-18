@@ -36,6 +36,7 @@ setup(
     install_requires=requirements,
     license="GNU General Public License v3",
     long_description=readme + '\n\n' + history,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='proved',
     name='proved',
@@ -46,4 +47,5 @@ setup(
     url='https://github.com/marcopegoraro/proved',
     version='0.1.0',
     zip_safe=False,
+    python_requires='>=3.6',
 )
