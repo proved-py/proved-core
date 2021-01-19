@@ -1,3 +1,0 @@
-pm4py==1.2.5
-pm4pycvxopt==0.0.5
-networkx==2.4
