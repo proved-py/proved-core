@@ -38,7 +38,7 @@ setup(
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    keywords='proved',
+    keywords=['proved', 'process mining', 'data science', 'process discovery', 'conformance checking'],
     name='proved',
     packages=find_packages(include=['proved']),
     setup_requires=setup_requirements,
