@@ -8,7 +8,7 @@ PROVED (PRocess mining OVer uncErtain Data)
 
 Branch dedicated to the experiments for the paper
 
-**"`Conformance Checking over Uncertain Event Data`_"**,
+**" `Conformance Checking over Uncertain Event Data`_ "**,
 Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst
 
 Experiments are in the 'experiments' folder.
