@@ -2,6 +2,10 @@
 PROVED (PRocess mining OVer uncErtain Data)
 ================================================
 
+
+.. image:: https://img.shields.io/pypi/v/proved.svg
+        :target: https://pypi.python.org/pypi/proved
+
 PROVED (PRocess mining OVer uncErtain Data) is a library of functionalities to perform process mining on uncertain event data.
 
 Other branches of this repository contain experiments of related publications.
