@@ -14,9 +14,9 @@ In *International Conference on Business Information Systems (BIS)*, 2020.
 
 Experiments are in the folder experiments. Needs additional data files to run:
 
-* BPI_Challenge_2012.xes: from https://data.4tu.nl/repository/uuid:3926db30-f712-4394-aebc-75976070e91f
-* Help_Desk_event_log.xes: from https://data.4tu.nl/repository/uuid:0c60edf1-6f83-4e75-9367-4c63b3e9d5bb
-* Road_Traffic_Fine_Management_Process.xes: from https://data.4tu.nl/repository/uuid:270fd440-1057-4fb9-89a9-b699b47990f5
+* BPI_Challenge_2012.xes: from https://data.4tu.nl/articles/dataset/BPI_Challenge_2012/12689204
+* Help_Desk_event_log.xes: from https://data.4tu.nl/articles/dataset/Dataset_belonging_to_the_help_desk_log_of_an_Italian_Company/12675977 (finale.csv, converted to XES)
+* Road_Traffic_Fine_Management_Process.xes: from https://data.4tu.nl/articles/dataset/Road_Traffic_Fine_Management_Process/12683249
 
 For more information see http://mpegoraro.net/pages/research.html
 
