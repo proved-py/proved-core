@@ -10,7 +10,7 @@ Branch dedicated to the experiments for the paper
 
 **"Efficient Construction of Behavior Graphs for Uncertain Event Data"**,
 Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst,
-In *International Conference on Business Information Systems (BIS)*, 2020.
+In *International Conference on Business Information Systems (BIS)*, 2020. DOI: https://doi.org/10.1007/978-3-030-53337-3_6
 
 Experiments are in the folder experiments. Needs additional data files to run:
 
