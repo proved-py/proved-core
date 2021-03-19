@@ -13,5 +13,8 @@ def realization_set(trace):
     :rtype:
     """
 
-    behavior_net, bn_i, bn_f = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+    behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
+    bn_i = behavior_net.initial_marking
+    bn_f = behavior_net.final_marking
+    
     return acyclic_net_variants(behavior_net, bn_i, bn_f)
