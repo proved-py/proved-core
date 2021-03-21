@@ -1,4 +1,5 @@
 import os
+import csv
 from copy import deepcopy
 from random import choice, sample, seed
 from time import process_time
@@ -11,13 +12,16 @@ import pm4py.objects.log.util.xes as xes_key
 from pm4py.objects.log.util import sorting
 import matplotlib.pyplot as plt
 from matplotlib import rc
+from numpy import mean, median
 
 from experiments.utils import apply_playout, import_net
 
 rc('text', usetex=True)
 
 from proved.simulation.bewilderer.add_uncertainty import add_uncertainty
-from proved.algorithms.conformance.alignments.alignment_bounds_su import cost_bounds_su_log, exec_alignment_lower_bound_su_log_bruteforce, exec_alignment_lower_bound_su_log
+from proved.algorithms.conformance.alignments.alignment_bounds_su import cost_bounds_su_log, exec_alignment_lower_bound_su_log_bruteforce, exec_alignment_lower_bound_su_log, acyclic_net_variants_new
+from proved.artifacts.behavior_graph import behavior_graph
+from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
 
 seed(123456)
 
@@ -122,11 +126,11 @@ def qualitative_experiments():
     # Pickling results
     import pickle
     with open('qualitative_results_new.pickle', 'wb') as f:
-        pickle.dump((uncertainty_values, qualitative_results), f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump((uncertainty_types, qualitative_results), f, pickle.HIGHEST_PROTOCOL)
 
     # import pickle
-    # with open(os.path.join('experiments', 'qualitative_results_new.pickle'), 'rb') as f:
-    #     uncertainty_values, qualitative_results = pickle.load(f)
+    # with open('qualitative_results_new.pickle', 'rb') as f:
+    #     uncertainty_types, qualitative_results = pickle.load(f)
 
     # Plotting
     fig, plots = plt.subplots(len(deviation_types), len(uncertainty_types), sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
@@ -213,18 +217,20 @@ def quantitative_experiments():
     # Pickling results
     import pickle
     with open('quantitative_results.pickle', 'wb') as f:
-        pickle.dump((uncertainty_value, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump((uncertainty_types, quantitative_results), f, pickle.HIGHEST_PROTOCOL)
 
     # import pickle
-    # with open(os.path.join('experiments', 'quantitative_results.pickle'), 'rb') as f:
-    #     uncertainty_values, quantitative_results = pickle.load(f)
+    # with open(os.path.join('quantitative_results.pickle', 'rb') as f:
+    #     uncertainty_types, quantitative_results = pickle.load(f)
 
     # Plotting averages
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
-        plots[i].plot(net_sizes, improved_time_series, '--r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b', label='Baseline')
+        plots[i].plot(net_sizes, improved_time_series, '--r', label='Behavior net')
+        plots[i].legend(loc='upper left')
+        plots[i].xaxis.set_label_position('top')
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Mean time (seconds)')
@@ -234,7 +240,7 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
-    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+    fig.text(0.525, 0.01, 'Net size (number of transitions)', ha='center', fontsize=14)
 
     plt.show()
 
@@ -242,8 +248,10 @@ def quantitative_experiments():
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
-        plots[i].plot(net_sizes, improved_time_series, '--r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b', label='Baseline')
+        plots[i].plot(net_sizes, improved_time_series, '--r', label='Behavior net')
+        plots[i].legend(loc='upper left')
+        plots[i].xaxis.set_label_position('top')
         plots[i].set_xlabel(uncertainty_type)
         if i == 0:
             plots[i].set_ylabel('Median time (seconds)')
@@ -253,7 +261,7 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
-    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+    fig.text(0.525, 0.01, 'Net size (number of transitions)', ha='center', fontsize=14)
 
     plt.show()
 
@@ -261,8 +269,10 @@ def quantitative_experiments():
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_mean(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
-        plots[i].plot(net_sizes, improved_time_series, '--r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b', label='Baseline')
+        plots[i].plot(net_sizes, improved_time_series, '--r', label='Behavior net')
+        plots[i].legend(loc='upper left')
+        plots[i].xaxis.set_label_position('top')
         plots[i].set_xlabel(uncertainty_type)
         plots[i].set_yscale('log')
         if i == 0:
@@ -273,7 +283,7 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
-    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+    fig.text(0.525, 0.01, 'Net size (number of transitions)', ha='center', fontsize=14)
 
     plt.show()
 
@@ -281,8 +291,10 @@ def quantitative_experiments():
     fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
     for i, uncertainty_type in enumerate(uncertainty_types):
         bruteforce_time_series, improved_time_series = generate_data_series_quantitative_median(net_sizes, quantitative_results[uncertainty_type])
-        plots[i].plot(net_sizes, bruteforce_time_series, ':b')
-        plots[i].plot(net_sizes, improved_time_series, '--r')
+        plots[i].plot(net_sizes, bruteforce_time_series, ':b', label='Baseline')
+        plots[i].plot(net_sizes, improved_time_series, '--r', label='Behavior net')
+        plots[i].legend(loc='upper left')
+        plots[i].xaxis.set_label_position('top')
         plots[i].set_xlabel(uncertainty_type)
         plots[i].set_yscale('log')
         if i == 0:
@@ -293,11 +305,139 @@ def quantitative_experiments():
     for diagram in plots.flat:
         diagram.label_outer()
 
-    fig.text(0.525, 0.01, 'Uncertainty (type and percentage)', ha='center', fontsize=14)
+    fig.text(0.525, 0.01, 'Net size (number of transitions)', ha='center', fontsize=14)
+
+    plt.show()
+
+
+def number_of_realizations_vs_net_size_experiment():
+    ntraces = 100
+    uncertainty_value = .05
+    uncertainty_types = {'Activities': (uncertainty_value, 0, 0), 'Timestamps': (0, uncertainty_value, 0), 'Indeterminate events': (0, 0, uncertainty_value), 'All': (uncertainty_value, uncertainty_value, uncertainty_value)}
+    # net_sizes = [5, 10, 15, 20]
+    net_sizes = [5, 10, 15, 20, 25, 30, 35, 40]
+    nets_map = {net_size: [import_net(net_file) for net_file in sorted(glob.glob(os.path.join('models', 'net' + str(net_size), '*.pnml')))] for net_size in net_sizes}
+
+    # Nets is a dictionary where the key is an integer (the size of the net), and the value is a list of 3-uples with net, initial marking and final marking
+
+    # number_of_realizations = defaultdict(dict)
+    #
+    # for uncertainty_type, uncertainty in uncertainty_types.items():
+    #     unc_act_value, unc_time_value, unc_indet_value = uncertainty
+    #     print('Testing uncertainty values: ' + str(unc_act_value) + ' ' + str(unc_time_value) + ' ' + str(unc_indet_value))
+    #     for net_size, nets in nets_map.items():
+    #         print('Testing net size: ' + str(net_size))
+    #         number_of_realizations[uncertainty_type][net_size] = []
+    #         i = 0
+    #         number_of_realizations_by_log = []
+    #         for net, im, fm in nets:
+    #             print('Testing net: ' + str(i))
+    #             log = apply_playout(net, im, fm, no_traces=ntraces)
+    #             add_uncertainty(unc_act_value, unc_time_value, unc_indet_value, log)
+    #             behavior_nets = [behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace)) for trace in log]
+    #             number_of_realizations_by_log.append(sum([len(acyclic_net_variants_new(behavior_net, behavior_net.initial_marking, behavior_net.final_marking)) for behavior_net in behavior_nets]))
+    #             i += 1
+    #         number_of_realizations[uncertainty_type][net_size] = mean(number_of_realizations_by_log)
+
+    # Pickling results
+    # import pickle
+    # with open('number_of_realizations_vs_net_size.pickle', 'wb') as f:
+    #     pickle.dump((uncertainty_types, number_of_realizations), f, pickle.HIGHEST_PROTOCOL)
+
+    import pickle
+    with open('number_of_realizations_vs_net_size.pickle', 'rb') as f:
+        uncertainty_types, number_of_realizations = pickle.load(f)
+
+    # # Printing averages
+    # with open('number_of_realizations_vs_net_size.csv', 'w') as f:
+    #     # pickle.dump((uncertainty_types, number_of_realizations), f, pickle.HIGHEST_PROTOCOL)
+    #     csv_writer = csv.writer(f)
+    #     csv_writer.writerow([''] + [str(key) for key in uncertainty_types.keys()])
+    #     for net_size in number_of_realizations[list(uncertainty_types.keys())[0]]:
+    #         row = [net_size]
+    #         for uncertainty_type in uncertainty_types:
+    #             row.append(number_of_realizations[uncertainty_type][net_size])
+    #         csv_writer.writerow(row)
+
+    # Plotting averages and medians (log)
+    fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    for i, uncertainty_type in enumerate(uncertainty_types):
+        mean_series = [number_of_realizations[uncertainty_type][net_size] for net_size in net_sizes]
+        plots[i].plot(net_sizes, mean_series, 'r')
+        plots[i].xaxis.set_label_position('top')
+        plots[i].set_xlabel(uncertainty_type)
+        plots[i].set_yscale('log')
+        if i == 0:
+            plots[i].set_ylabel('Number of realizations')
+
+        plots[i].margins(y=.15)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    fig.text(0.525, 0.01, 'Net size (number of transitions)', ha='center', fontsize=14)
+
+    plt.show()
+
+
+def number_of_realizations_vs_uncertainty_experiment():
+    ntraces = 100
+    uncertainty_values = (0, .02, .04, .06, .08, .1, .12, .14)
+    zeroes = tuple([0] * len(uncertainty_values))
+    uncertainty_types = {'Activities': (uncertainty_values, zeroes, zeroes), 'Timestamps': (zeroes, uncertainty_values, zeroes), 'Indeterminate events': (zeroes, zeroes, uncertainty_values), 'All': (uncertainty_values, uncertainty_values, uncertainty_values)}
+    net_size = 10
+    nets_files = sorted(glob.glob(os.path.join('models', 'net' + str(net_size), '*.pnml')))
+    model_data = [import_net(net_file) for net_file in nets_files]
+
+    # number_of_realizations = dict()
+    #
+    # for uncertainty_type, uncertainties in uncertainty_types.items():
+    #     unc_act_values, unc_time_values, unc_indet_values = uncertainties
+    #     number_of_realizations[uncertainty_type] = []
+    #     for j in range(len(unc_act_values)):
+    #         number_of_realizations_by_log = []
+    #         for this_model_data in model_data:
+    #             net, im, fm = this_model_data
+    #             log = apply_playout(net, im, fm, no_traces=ntraces)
+    #             # Adding uncertainty
+    #             uncertain_log = deepcopy(log)
+    #             add_uncertainty(unc_act_values[j], unc_time_values[j], unc_indet_values[j], uncertain_log)
+    #             behavior_nets = [behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace)) for trace in uncertain_log]
+    #             number_of_realizations_by_log.append(sum([len(acyclic_net_variants_new(behavior_net, behavior_net.initial_marking, behavior_net.final_marking)) for behavior_net in behavior_nets]))
+    #         number_of_realizations[uncertainty_type].append(mean(number_of_realizations_by_log))
+
+    # Pickling results
+    # import pickle
+    # with open('number_of_realizations_vs_uncertainty.pickle', 'wb') as f:
+    #     pickle.dump((uncertainty_types, number_of_realizations), f, pickle.HIGHEST_PROTOCOL)
+
+    import pickle
+    with open('number_of_realizations_vs_uncertainty.pickle', 'rb') as f:
+        uncertainty_types, number_of_realizations = pickle.load(f)
+
+    # Plotting averages and medians (log)
+    fig, plots = plt.subplots(ncols=len(uncertainty_types), sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0})
+    for i, uncertainty_type in enumerate(uncertainty_types):
+        # mean_series = [number_of_realizations[uncertainty_type][net_size] for net_size in net_sizes]
+        plots[i].plot(uncertainty_values, number_of_realizations[uncertainty_type], 'r')
+        plots[i].xaxis.set_label_position('top')
+        plots[i].set_xlabel(uncertainty_type)
+        plots[i].set_yscale('log')
+        if i == 0:
+            plots[i].set_ylabel('Number of realizations')
+
+        plots[i].margins(y=.15)
+
+    for diagram in plots.flat:
+        diagram.label_outer()
+
+    fig.text(0.525, 0.01, 'Uncertainty (percentage)', ha='center', fontsize=14)
 
     plt.show()
 
 
 if __name__ == '__main__':
-    qualitative_experiments()
-    quantitative_experiments()
+    # qualitative_experiments()
+    # quantitative_experiments()
+    number_of_realizations_vs_net_size_experiment()
+    number_of_realizations_vs_uncertainty_experiment()
