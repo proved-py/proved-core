@@ -1,37 +1,28 @@
-======
-proved
-======
+================================================
+PROVED (PRocess mining OVer uncErtain Data)
+================================================
 
 
 .. image:: https://img.shields.io/pypi/v/proved.svg
         :target: https://pypi.python.org/pypi/proved
 
-.. image:: https://img.shields.io/travis/marcopegoraro/proved.svg
-        :target: https://travis-ci.org/marcopegoraro/proved
+Branch dedicated to the experiments for the paper
 
-.. image:: https://readthedocs.org/projects/proved/badge/?version=latest
-        :target: https://proved.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+"`Conformance Checking over Uncertain Event Data`_",   
+Marco Pegoraro, Merih Seran Uysal, Wil M.P. van der Aalst
 
+Experiments are in the 'experiments' folder.
 
-
-
-PROVED (PRocess mining OVer uncErtain Data) is a collection of tools to perform process mining on uncertain event data.
-
-
-* Free software: GNU General Public License v3
-* Documentation: TODO
-
-
-Features
---------
-
-* TODO
 
 Credits
 -------
+
+Project owner: `Marco Pegoraro`_
+
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _`Marco Pegoraro`: http://mpegoraro.net/
+.. _`Conformance Checking over Uncertain Event Data`: http://mpegoraro.net/pages/research.html#pegoraro2021conformance
