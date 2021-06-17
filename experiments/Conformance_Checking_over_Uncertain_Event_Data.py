@@ -1,5 +1,4 @@
 import os
-import csv
 from copy import deepcopy
 from random import choice, sample, seed
 from time import process_time
@@ -12,7 +11,7 @@ import pm4py.objects.log.util.xes as xes_key
 from pm4py.objects.log.util import sorting
 import matplotlib.pyplot as plt
 from matplotlib import rc
-from numpy import mean, median
+from numpy import mean
 
 from experiments.utils import apply_playout, import_net
 
