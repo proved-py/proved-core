@@ -1,5 +1,5 @@
-from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply
-from pm4py.algo.conformance.alignments.versions.state_equation_a_star import apply_trace_net
+from pm4py.algo.conformance.alignments.petri_net.variants.state_equation_a_star import apply
+from pm4py.algo.conformance.alignments.petri_net.variants.state_equation_a_star import apply_trace_net
 
 from proved.artifacts.behavior_graph import behavior_graph
 from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
