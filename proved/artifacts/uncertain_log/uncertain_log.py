@@ -29,10 +29,24 @@ class UncertainLog(EventLog):
         if self.behavior_graphs_map is not {}:
             variant_list = [(len(traces_list), nodes_list) for nodes_list, (_, traces_list) in self.behavior_graphs_map.items()]
             variant_list.sort(reverse=True)
-            self.__variants = {i: (variant_length, nodes_tuple) for i, (variant_length, nodes_tuple) in enumerate(variant_list)}
+            self.__variants = {i: (variant_cardinality, nodes_tuple) for i, (variant_cardinality, nodes_tuple) in enumerate(variant_list)}
 
     def get_behavior_graph(self, trace):
-        return self.behavior_graphs_map[behavior_graph.create_nodes_tuples(trace)]
+        # return self.behavior_graphs_map[behavior_graph.create_nodes_tuples(trace)]
+        return self.behavior_graphs_map[behavior_graph.create_nodes_tuples(trace)][0]
+
+    def get_behavior_graphs_multiset(self):
+        return [(graph, len(traces_list)) for graph, traces_list in self.behavior_graphs_map.values()]
+
+    def get_cardinality(self, trace):
+        return len(self.behavior_graphs_map[behavior_graph.create_nodes_tuples(trace)][1])
+
+    def get_activity_labels(self):  # TODO: test this
+        log_activity_labels = set()
+        for (_, nodes_tuple) in self.__variants.values():
+            for ((_, activity_labels), _) in nodes_tuple:
+                log_activity_labels.update(activity_labels)
+        return log_activity_labels
 
     variants = property(__get_variants)
     behavior_graphs_map = property(__get_behavior_graphs_map)

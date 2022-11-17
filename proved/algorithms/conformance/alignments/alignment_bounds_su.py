@@ -3,7 +3,7 @@ from pm4py.algo.conformance.alignments.petri_net.variants.state_equation_a_star 
 
 from proved.artifacts.behavior_graph import behavior_graph
 from proved.artifacts.behavior_net import behavior_net as behavior_net_builder
-from proved.artifacts.behavior_net.utils import acyclic_net_variants
+from proved.artifacts.behavior_net.utils import generate_all_traces
 
 
 def alignment_bounds_su_log(log, petri_net, initial_marking, final_marking, parameters=None):
@@ -56,7 +56,7 @@ def alignment_upper_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
-    r_s = acyclic_net_variants(behavior_net, bn_i, bn_f)
+    r_s = generate_all_traces(behavior_net, bn_i, bn_f)
 
     # Computes the upper bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in r_s]
@@ -96,7 +96,7 @@ def alignment_lower_bound_su_trace_bruteforce(behavior_net, bn_i, bn_f, petri_ne
     """
 
     # Obtains all the realizations of the trace by executing all possible variants from the behavior net
-    r_s = acyclic_net_variants(behavior_net, bn_i, bn_f)
+    r_s = generate_all_traces(behavior_net, bn_i, bn_f)
 
     # Computes the lower bound for conformance via bruteforce on the realization set
     alignments = [apply(trace, petri_net, initial_marking, final_marking, parameters) for trace in r_s]

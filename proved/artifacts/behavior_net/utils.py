@@ -3,9 +3,9 @@ from pm4py.objects.log.log import Trace, Event
 from pm4py.util.xes_constants import DEFAULT_NAME_KEY
 
 
-def acyclic_net_variants(net, initial_marking, final_marking, activity_key=DEFAULT_NAME_KEY):
+def generate_all_sequences(net, initial_marking, final_marking):
     """
-    Given an acyclic accepting Petri net, initial and final marking extracts a set of variants (in form of traces)
+    Given an acyclic accepting Petri net, initial and final marking extracts a set of variants (in form of lists of activity labels)
     replayable on the net.
     Warning: this function is based on a marking exploration. If the accepting Petri net contains loops, the method
     will not work properly as it stops the search if a specific marking has already been encountered.
@@ -18,9 +18,9 @@ def acyclic_net_variants(net, initial_marking, final_marking, activity_key=DEFAU
 
     Returns
     -------
-    :return: variants: :class:`list` Set of variants - in the form of Trace objects - obtainable executing the net
-
+    :return: variants: :class:`list` Set of variants - in the form of lists of activity labels - obtainable executing the net
     """
+
     active = {(initial_marking, ())}
     visited = set()
     variants = set()
@@ -44,6 +44,29 @@ def acyclic_net_variants(net, initial_marking, final_marking, activity_key=DEFAU
                 if hash_next_pair not in visited and hash_curr_pair != hash_next_pair:
                     active.add((next_marking, next_partial_trace))
         visited.add(hash_curr_pair)
+    return variants
+
+
+def generate_all_traces(net, initial_marking, final_marking, activity_key=DEFAULT_NAME_KEY):
+    """
+    Given an acyclic accepting Petri net, initial and final marking extracts a set of variants (in form of traces)
+    replayable on the net.
+    Warning: this function is based on a marking exploration. If the accepting Petri net contains loops, the method
+    will not work properly as it stops the search if a specific marking has already been encountered.
+
+    Parameters
+    ----------
+    :param net: An acyclic workflow net
+    :param initial_marking: The initial marking of the net.
+    :param final_marking: The final marking of the net.
+
+    Returns
+    -------
+    :return: variants: :class:`list` Set of variants - in the form of Trace objects - obtainable executing the net
+    """
+
+    variants = generate_all_sequences(net, initial_marking, final_marking)
+
     trace_variants = []
     for variant in variants:
         trace = Trace()

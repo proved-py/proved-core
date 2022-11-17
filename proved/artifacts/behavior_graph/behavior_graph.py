@@ -1,4 +1,5 @@
 import operator
+from datetime import timedelta
 
 from networkx import DiGraph
 from pm4py.objects.log.util import xes
@@ -24,7 +25,7 @@ def create_nodes_tuples(trace, activity_key=xes.DEFAULT_NAME_KEY, timestamp_key=
         # Fill in the timestamps list
         if u_timestamp_min_key not in event:
             nodes_tuples.append((event[timestamp_key], new_node, False))
-            nodes_tuples.append((event[timestamp_key], new_node, True))
+            nodes_tuples.append((event[timestamp_key] + timedelta.resolution, new_node, True))  # TODO: test this
         else:
             nodes_tuples.append((event[u_timestamp_min_key], new_node, False))
             nodes_tuples.append((event[u_timestamp_max_key], new_node, True))
