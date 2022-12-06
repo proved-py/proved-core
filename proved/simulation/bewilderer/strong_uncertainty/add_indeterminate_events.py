@@ -1,9 +1,9 @@
 from random import random, sample
 
-from proved.xes_keys import DEFAULT_U_MISSING_KEY
+from proved.xes_keys import DEFAULT_U_DISCRETE_STRONG, DEFAULT_U_INDETERMINACY_KEY
 
 
-def add_indeterminate_events_to_log(p, log=None, log_map=None, u_missing_key=DEFAULT_U_MISSING_KEY):
+def add_indeterminate_events_to_log(p, log=None, log_map=None, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_indeterminacy_key=DEFAULT_U_INDETERMINACY_KEY):
     """
     Turns events in an trace into indeterminate events with a certain probability.
 
@@ -30,10 +30,10 @@ def add_indeterminate_events_to_log(p, log=None, log_map=None, u_missing_key=DEF
         indices_to_add = sample(frozenset(log_map), to_add)
         for i in indices_to_add:
             trace, j = log_map[i]
-            trace[j][u_missing_key] = 1
+            trace[j][u_indeterminacy_key] = u_discrete_strong
 
 
-def add_indeterminate_events_to_log_montecarlo(log, p, u_missing_key=DEFAULT_U_MISSING_KEY):
+def add_indeterminate_events_to_log_montecarlo(log, p, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_indeterminacy_key=DEFAULT_U_INDETERMINACY_KEY):
     """
     Turns events in an event log into indeterminate events with a certain probability.
 
@@ -45,10 +45,10 @@ def add_indeterminate_events_to_log_montecarlo(log, p, u_missing_key=DEFAULT_U_M
 
     if p > 0.0:
         for trace in log:
-            add_indeterminate_events_to_trace_montecarlo(trace, p, u_missing_key)
+            add_indeterminate_events_to_trace_montecarlo(trace, p,u_discrete_strong, u_indeterminacy_key)
 
 
-def add_indeterminate_events_to_trace_montecarlo(trace, p, u_missing_key=DEFAULT_U_MISSING_KEY):
+def add_indeterminate_events_to_trace_montecarlo(trace, p, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_indeterminacy_key=DEFAULT_U_INDETERMINACY_KEY):
     """
     Turns events in an trace into indeterminate events with a certain probability.
 
@@ -61,4 +61,4 @@ def add_indeterminate_events_to_trace_montecarlo(trace, p, u_missing_key=DEFAULT
     if p > 0.0:
         for event in trace:
             if random() < p:
-                event[u_missing_key] = 1
+                event[u_indeterminacy_key] = u_discrete_strong

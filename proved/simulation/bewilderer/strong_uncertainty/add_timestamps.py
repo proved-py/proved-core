@@ -4,10 +4,10 @@ from datetime import timedelta
 
 from pm4py.objects.log.util.xes import DEFAULT_TIMESTAMP_KEY
 
-from proved.xes_keys import DEFAULT_U_TIMESTAMP_MIN_KEY, DEFAULT_U_TIMESTAMP_MAX_KEY
+from proved.xes_keys import DEFAULT_U_CONTINUOUS_STRONG, DEFAULT_U_TIMESTAMP_MIN_KEY, DEFAULT_U_TIMESTAMP_MAX_KEY, DEFAULT_U_TIMESTAMP_KEY
 
 
-def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY):
+def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_continuous_strong=DEFAULT_U_CONTINUOUS_STRONG, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY, u_timestamp_key=DEFAULT_U_TIMESTAMP_KEY):
     """
     Adds possible activity labels to events in a trace with a certain probability, up to a maximum.
 
@@ -38,19 +38,20 @@ def add_uncertain_timestamp_to_log(p, log=None, log_map=None, timestamp_key=DEFA
         indices_to_alter = sample(frozenset(log_map), to_alter)
         for i in indices_to_alter:
             trace, j = log_map[i]
-            # trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
-            # trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
+            if u_timestamp_key not in trace[j]:
+                trace[j][u_timestamp_key] = dict()
+                trace[j][u_timestamp_key]['value'] = u_continuous_strong
             # If the event is the first in the trace, we alter the timestamp to overlap the following event. If the event is the last in the trace, we alter the
             # timestamp to overlap the previous. In any other case, we pick either one at random.
             if j == 0 or (j != len(trace) - 1 and random() < .5):
-                trace[j][u_timestamp_min_key] = copy(trace[j][timestamp_key]) - timedelta(milliseconds=100)
-                trace[j][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
+                trace[j][u_timestamp_key][u_timestamp_min_key] = copy(trace[j][timestamp_key]) - timedelta(milliseconds=100)
+                trace[j][u_timestamp_key][u_timestamp_max_key] = copy(max(trace[j][timestamp_key], trace[min(j + 1, len(trace) - 1)][timestamp_key])) + timedelta(milliseconds=100)
             else:
-                trace[j][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
-                trace[j][u_timestamp_max_key] = copy(trace[j][timestamp_key]) + timedelta(milliseconds=100)
+                trace[j][u_timestamp_key][u_timestamp_min_key] = copy(min(trace[j][timestamp_key], trace[max(j - 1, 0)][timestamp_key])) - timedelta(milliseconds=100)
+                trace[j][u_timestamp_key][u_timestamp_max_key] = copy(trace[j][timestamp_key]) + timedelta(milliseconds=100)
 
 
-def add_uncertain_timestamp_to_log_montecarlo(log, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY):
+def add_uncertain_timestamp_to_log_montecarlo(log, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_continuous_strong=DEFAULT_U_CONTINUOUS_STRONG, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY, u_timestamp_key=DEFAULT_U_TIMESTAMP_KEY):
     """
     Adds possible activity labels to events in an event log with a certain probability, up to a maximum.
 
@@ -67,10 +68,10 @@ def add_uncertain_timestamp_to_log_montecarlo(log, p_left, p_right, max_overlap_
 
     if p_left > 0.0 or p_right > 0.0:
         for trace in log:
-            add_uncertain_timestamp_to_trace_montecarlo(trace, p_left, p_right, max_overlap_left, max_overlap_right, timestamp_key, u_timestamp_min_key, u_timestamp_max_key)
+            add_uncertain_timestamp_to_trace_montecarlo(trace, p_left, p_right, max_overlap_left, max_overlap_right, timestamp_key, u_continuous_strong, u_timestamp_min_key, u_timestamp_max_key, u_timestamp_key)
 
 
-def add_uncertain_timestamp_to_trace_montecarlo(trace, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY):
+def add_uncertain_timestamp_to_trace_montecarlo(trace, p_left, p_right, max_overlap_left=0, max_overlap_right=0, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_continuous_strong=DEFAULT_U_CONTINUOUS_STRONG, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY, u_timestamp_key=DEFAULT_U_TIMESTAMP_KEY):
     """
     Adds possible activity labels to events in a trace with a certain probability, up to a maximum.
 
@@ -95,23 +96,27 @@ def add_uncertain_timestamp_to_trace_montecarlo(trace, p_left, p_right, max_over
                 steps_right += 1
             # (Partially) supports events that already have uncertainty on timestamps
             # This might cause problems on events for which 'u_timestamp_min_key' <= 'timestamp_key' <= 'u_timestamp_max_key'
-            if u_timestamp_max_key in trace[i - steps_left]:
-                if u_timestamp_min_key in trace[i]:
-                    trace[i][u_timestamp_min_key] = copy(min(trace[i][u_timestamp_min_key], trace[i - steps_left][u_timestamp_max_key]))
+            if u_timestamp_key in trace[i - steps_left]:
+                if u_timestamp_key in trace[i]:
+                    trace[i][u_timestamp_key][u_timestamp_min_key] = copy(min(trace[i][u_timestamp_key][u_timestamp_min_key], trace[i - steps_left][u_timestamp_key][u_timestamp_max_key]))
                 else:
-                    trace[i][u_timestamp_min_key] = copy(min(trace[i][timestamp_key], trace[i - steps_left][u_timestamp_max_key]))
+                    trace[i][u_timestamp_key] = dict()
+                    trace[i][u_timestamp_key]['value'] = u_continuous_strong
+                    trace[i][u_timestamp_key][u_timestamp_min_key] = copy(min(trace[i][timestamp_key], trace[i - steps_left][u_timestamp_key][u_timestamp_max_key]))
             else:
-                if u_timestamp_min_key in trace[i]:
-                    trace[i][u_timestamp_min_key] = copy(min(trace[i][u_timestamp_min_key], trace[i - steps_left][timestamp_key]))
+                if u_timestamp_key in trace[i]:
+                    trace[i][u_timestamp_key][u_timestamp_min_key] = copy(min(trace[i][u_timestamp_key][u_timestamp_min_key], trace[i - steps_left][timestamp_key]))
                 else:
-                    trace[i][u_timestamp_min_key] = copy(min(trace[i][timestamp_key], trace[i - steps_left][timestamp_key]))
-            if u_timestamp_min_key in trace[i + steps_right]:
-                if u_timestamp_max_key in trace[i]:
-                    trace[i][u_timestamp_max_key] = copy(max(trace[i][u_timestamp_max_key], trace[i + steps_right][u_timestamp_min_key]))
+                    trace[i][u_timestamp_key] = dict()
+                    trace[i][u_timestamp_key]['value'] = u_continuous_strong
+                    trace[i][u_timestamp_key][u_timestamp_min_key] = copy(min(trace[i][timestamp_key], trace[i - steps_left][timestamp_key]))
+            if u_timestamp_key in trace[i + steps_right]:
+                if u_timestamp_key in trace[i]:
+                    trace[i][u_timestamp_key][u_timestamp_max_key] = copy(max(trace[i][u_timestamp_key][u_timestamp_max_key], trace[i + steps_right][u_timestamp_key][u_timestamp_min_key]))
                 else:
-                    trace[i][u_timestamp_max_key] = copy(max(trace[i][timestamp_key], trace[i + steps_right][u_timestamp_min_key]))
+                    trace[i][u_timestamp_key][u_timestamp_max_key] = copy(max(trace[i][timestamp_key], trace[i + steps_right][u_timestamp_key][u_timestamp_min_key]))
             else:
-                if u_timestamp_max_key in trace[i]:
-                    trace[i][u_timestamp_max_key] = copy(max(trace[i][u_timestamp_max_key], trace[i + steps_right][timestamp_key]))
+                if u_timestamp_key in trace[i]:
+                    trace[i][u_timestamp_key][u_timestamp_max_key] = copy(max(trace[i][u_timestamp_key][u_timestamp_max_key], trace[i + steps_right][timestamp_key]))
                 else:
-                    trace[i][u_timestamp_max_key] = copy(max(trace[i][timestamp_key], trace[i + steps_right][timestamp_key]))
+                    trace[i][u_timestamp_key][u_timestamp_max_key] = copy(max(trace[i][timestamp_key], trace[i + steps_right][timestamp_key]))

@@ -16,5 +16,16 @@ def realization_set(trace):
     behavior_net = behavior_net_builder.BehaviorNet(behavior_graph.BehaviorGraph(trace))
     bn_i = behavior_net.initial_marking
     bn_f = behavior_net.final_marking
-    
+
     return acyclic_net_variants(behavior_net, bn_i, bn_f)
+
+
+def random_realization(trace):
+    """
+    Returns one random realization of an uncertain trace. Samples with indicated distribution in case of weak uncertainty, and with uniform distribution in case of strong uncertainty.
+
+    :param trace: An uncertain trace.
+    :type trace:
+    :return: One random realization of the trace in input.
+    :rtype:
+    """
