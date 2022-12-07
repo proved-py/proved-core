@@ -3,10 +3,10 @@ import operator
 from networkx import DiGraph
 from pm4py.objects.log.util.xes import DEFAULT_NAME_KEY, DEFAULT_TIMESTAMP_KEY
 
-from proved.xes_keys import DEFAULT_U_CONTINUOUS_STRONG, DEFAULT_U_TIMESTAMP_MIN_KEY, DEFAULT_U_TIMESTAMP_MAX_KEY, DEFAULT_U_DENSITY_FUNCTION_KEY, DEFAULT_U_FUNCTION_PARAMETERS_KEY, DEFAULT_U_NAME_KEY, DEFAULT_U_TIMESTAMP_KEY, DEFAULT_U_INDETERMINACY_KEY
+from proved.xes_keys import DEFAULT_U_CONTINUOUS_STRONG, DEFAULT_U_TIMESTAMP_MIN_KEY, DEFAULT_U_TIMESTAMP_MAX_KEY, DEFAULT_U_DENSITY_FUNCTION_KEY, DEFAULT_U_NAME_KEY, DEFAULT_U_TIMESTAMP_KEY, DEFAULT_U_INDETERMINACY_KEY
 
 
-def create_nodes_tuples(trace, activity_key=DEFAULT_NAME_KEY, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_continuous_strong=DEFAULT_U_CONTINUOUS_STRONG, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY, u_function_key=DEFAULT_U_DENSITY_FUNCTION_KEY, u_params_key=DEFAULT_U_FUNCTION_PARAMETERS_KEY, u_activity_key=DEFAULT_U_NAME_KEY, u_timestamp_key=DEFAULT_U_TIMESTAMP_KEY, u_indeterminacy_key=DEFAULT_U_INDETERMINACY_KEY):
+def create_nodes_tuples(trace, activity_key=DEFAULT_NAME_KEY, timestamp_key=DEFAULT_TIMESTAMP_KEY, u_continuous_strong=DEFAULT_U_CONTINUOUS_STRONG, u_timestamp_min_key=DEFAULT_U_TIMESTAMP_MIN_KEY, u_timestamp_max_key=DEFAULT_U_TIMESTAMP_MAX_KEY, u_function_key=DEFAULT_U_DENSITY_FUNCTION_KEY, u_activity_key=DEFAULT_U_NAME_KEY, u_timestamp_key=DEFAULT_U_TIMESTAMP_KEY, u_indeterminacy_key=DEFAULT_U_INDETERMINACY_KEY):
     # Timestamp type: False is 'minimum', True is 'maximum'
     nodes_tuples = []
     for i, event in enumerate(trace):

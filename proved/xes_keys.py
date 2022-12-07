@@ -17,9 +17,7 @@ DEFAULT_U_TIMESTAMP_MIN_KEY = 'uncertainty:timestamp_min'
 DEFAULT_U_TIMESTAMP_MAX_KEY = 'uncertainty:timestamp_max'
 
 DEFAULT_U_PROBABILITY_KEY = 'uncertainty:probability'
-
 DEFAULT_U_DENSITY_FUNCTION_KEY = 'uncertainty:density_function'
-DEFAULT_U_FUNCTION_PARAMETERS_KEY = 'uncertainty:function_parameters'
 
 DEFAULT_U_NAME_KEY = 'uncertainty:name'
 DEFAULT_U_TIMESTAMP_KEY = 'uncertainty:timestamp'
