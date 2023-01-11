@@ -15,7 +15,6 @@ DEFAULT_U_CONTINUOUS_WEAK = 'continuous_weak'
 
 DEFAULT_U_TIMESTAMP_MIN_KEY = 'uncertainty:timestamp_min'
 DEFAULT_U_TIMESTAMP_MAX_KEY = 'uncertainty:timestamp_max'
-
 DEFAULT_U_PROBABILITY_KEY = 'uncertainty:probability'
 DEFAULT_U_DENSITY_FUNCTION_KEY = 'uncertainty:density_function'
 
