@@ -2,10 +2,10 @@ from random import random, sample
 
 from pm4py.objects.log.util.xes import DEFAULT_NAME_KEY
 
-from proved.xes_keys import DEFAULT_U_NAME_KEY
+from proved.xes_keys import DEFAULT_U_DISCRETE_STRONG, DEFAULT_U_NAME_KEY
 
 
-def add_uncertain_activities_to_log(p, log=None, log_map=None, max_labels_to_add=1, label_set=None, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
+def add_uncertain_activities_to_log(p, log=None, log_map=None, max_labels_to_add=1, label_set=None, activity_key=DEFAULT_NAME_KEY, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_activity_key=DEFAULT_U_NAME_KEY):
     """
     Adds possible activity labels to events in a trace with a certain probability, up to a maximum.
 
@@ -45,10 +45,11 @@ def add_uncertain_activities_to_log(p, log=None, log_map=None, max_labels_to_add
         for i in indices_to_alter:
             trace, j = log_map[i]
             trace[j][u_activity_key] = dict()
-            trace[j][u_activity_key]['children'] = {activity_label: 0 for activity_label in [trace[j][activity_key]] + sample(list(label_set - {trace[j][activity_key]}), labels_to_add)}
+            trace[j][u_activity_key]['value'] = u_discrete_strong
+            trace[j][u_activity_key]['children'] = {activity_label: None for activity_label in [trace[j][activity_key]] + sample(list(label_set - {trace[j][activity_key]}), labels_to_add)}
 
 
-def add_uncertain_activities_to_log_montecarlo(log, p, max_labels=0, label_set=None, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
+def add_uncertain_activities_to_log_montecarlo(log, p, max_labels=0, label_set=None, activity_key=DEFAULT_NAME_KEY, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_activity_key=DEFAULT_U_NAME_KEY):
     """
     Adds possible activity labels to events in an event log with a certain probability, up to a maximum.
 
@@ -68,10 +69,10 @@ def add_uncertain_activities_to_log_montecarlo(log, p, max_labels=0, label_set=N
                 for event in trace:
                     label_set.add(event[activity_key])
         for trace in log:
-            add_uncertain_activities_to_trace_montecarlo(trace, p, label_set, max_labels, activity_key, u_activity_key)
+            add_uncertain_activities_to_trace_montecarlo(trace, p, label_set, max_labels, activity_key, u_discrete_strong, u_activity_key)
 
 
-def add_uncertain_activities_to_trace_montecarlo(trace, p, max_labels=0, label_set=None, activity_key=DEFAULT_NAME_KEY, u_activity_key=DEFAULT_U_NAME_KEY):
+def add_uncertain_activities_to_trace_montecarlo(trace, p, max_labels=0, label_set=None, activity_key=DEFAULT_NAME_KEY, u_discrete_strong=DEFAULT_U_DISCRETE_STRONG, u_activity_key=DEFAULT_U_NAME_KEY):
     """
     Adds possible activity labels to events in a trace with a certain probability, up to a maximum.
 
@@ -101,6 +102,7 @@ def add_uncertain_activities_to_trace_montecarlo(trace, p, max_labels=0, label_s
             if to_add > 0:
                 if u_activity_key not in event:
                     event[u_activity_key] = dict()
+                    event[u_activity_key]['value'] = u_discrete_strong
                     event[u_activity_key]['children'] = {activity_label: 0 for activity_label in [event[activity_key]] + sample(label_set - {event[activity_key]}, to_add)}
                 else:
                     event[u_activity_key]['children'].update({activity_label: 0 for activity_label in [event[activity_key]] + sample(label_set - {event[activity_key]}, to_add)})
