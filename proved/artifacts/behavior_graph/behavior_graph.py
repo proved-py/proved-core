@@ -95,8 +95,13 @@ class BehaviorGraph(DiGraph):
 if __name__ == '__main__':
     import pm4py
     log = pm4py.read_xes('new_format_weak_fixed_v3.xml')
-    bg1 = BehaviorGraph(log[0])
-    print(bg1.nodes)
-    print(bg1.edges)
-    from proved.visualizations.graphviz.behavior_graph import behavior_graph_graphviz
-    behavior_graph_graphviz(bg1).view()
+    #bg1 = BehaviorGraph(log[0])
+    #print(bg1.nodes)
+    #print(bg1.edges)
+    #from proved.visualizations.graphviz.behavior_graph import behavior_graph_graphviz
+    #behavior_graph_graphviz(bg1).view()
+    from proved.artifacts.uncertain_log.utils import random_realization
+    for i in range(0, 3):
+        for event in random_realization(log[0]):
+            print(event)
+        print('#########################################')
