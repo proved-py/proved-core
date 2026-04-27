@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log>
+   <trace>
+      <string key="concept:name" value="ID192" />
+      <event>
+         <string key="concept:name" value="NightSweats" />
+         <date key="time:timestamp" value="2011-07-05T12:00:00+00:00" />
+         <string key="uncertainty:indeterminacy" value="discrete_strong" />
+      </event>
+      <event>
+         <string key="concept:name" value="PrTP" />
+         <date key="time:timestamp" value="2011-07-08T12:00:00+00:00" />
+         <string key="uncertainty:name" value="discrete_strong">
+            <string key="PrTP" />
+            <string key="SecTP" />
+         </string>
+      </event>
+      <event>
+         <string key="concept:name" value="Splenomeg" />
+         <date key="time:timestamp" value="2011-07-07T12:00:00+00:00" />
+         <string key="uncertainty:timestamp" value="continuous_strong">
+            <date key="uncertainty:timestamp_min" value="2011-07-04T12:00:00+00:00" />
+            <date key="uncertainty:timestamp_max" value="2011-07-10T12:00:00+00:00" />
+         </string>
+      </event>
+   </trace>
+</log>

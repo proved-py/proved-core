@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log>
+   <trace>
+      <string key="concept:name" value="ID193" />
+      <event>
+         <string key="concept:name" value="NightSweats" />
+         <date key="time:timestamp" value="2011-07-05T12:00:00+00:00" />
+         <string key="uncertainty:indeterminacy" value="discrete_weak">
+            <float key="uncertainty:probability" value="0.25" />
+         </string>
+      </event>
+      <event>
+         <string key="concept:name" value="PrTP" />
+         <date key="time:timestamp" value="2011-07-08T12:00:00+00:00" />
+         <string key="uncertainty:name" value="discrete_weak">
+            <float key="PrTP" value="0.90"/>
+            <float key="SecTP" value="0.10"/>
+         </string>
+      </event>
+      <event>
+         <string key="concept:name" value="Splenomeg" />
+         <date key="time:timestamp" value="2011-07-07T12:00:00+00:00" />
+         <string key="uncertainty:timestamp" value="continuous_weak">
+            <string key="uncertainty:density_function" value="scipy.stats.norm">
+               <float key="loc" value="1310119200.0" />
+               <float key="scale" value="5000.0" />
+            </string>
+         </string>
+      </event>
+   </trace>
+</log>
